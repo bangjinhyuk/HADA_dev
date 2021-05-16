@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "939053050894",
+    "firebase_url": "https://test-5e2be-default-rtdb.firebaseio.com",
+    "project_id": "test-5e2be",
+    "storage_bucket": "test-5e2be.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:939053050894:android:19ace5798a244eb597e05f",
+        "android_client_info": {
+          "package_name": "com.hada.firebase_realtimedatabase"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "939053050894-9aotshrnv5tasv2gpac9gp0uo3ttuf3a.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBR9X02IwTUZ_Uze8yiXsuLd8LjOufEKfc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "939053050894-9aotshrnv5tasv2gpac9gp0uo3ttuf3a.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
