@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:card_view="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <androidx.cardview.widget.CardView
+        android:id="@+id/card_view"
+        android:layout_width="match_parent"
+        android:layout_height="100dp"
+        android:layout_gravity="center"
+        android:layout_marginLeft="16dp"
+        android:layout_marginRight="16dp"
+        android:layout_marginTop="8dp"
+        card_view:cardCornerRadius="5dp"
+        card_view:layout_constraintBottom_toBottomOf="parent"
+        card_view:layout_constraintEnd_toEndOf="parent"
+        card_view:layout_constraintStart_toStartOf="parent"
+        card_view:layout_constraintTop_toTopOf="parent">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <TextView
+                android:id="@+id/fridge_name"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="2번 냉장고 온습도 센서"
+                android:textSize="20dp"
+                card_view:layout_constraintBottom_toBottomOf="parent"
+                card_view:layout_constraintEnd_toEndOf="parent"
+                card_view:layout_constraintHorizontal_bias="0.05"
+                card_view:layout_constraintStart_toStartOf="parent"
+                card_view:layout_constraintTop_toTopOf="parent"
+                card_view:layout_constraintVertical_bias="0.20999998" />
+
+            <TextView
+                android:id="@+id/temperature"
+                android:layout_width="wrap_content"
+                android:layout_height="20dp"
+                android:layout_marginStart="8dp"
+                android:text="12.3℃"
+                android:textSize="16dp"
+                card_view:layout_constraintBottom_toBottomOf="parent"
+                card_view:layout_constraintEnd_toEndOf="parent"
+                card_view:layout_constraintHorizontal_bias="0.0"
+                card_view:layout_constraintStart_toEndOf="@+id/img_temperature"
+                card_view:layout_constraintTop_toTopOf="parent"
+                card_view:layout_constraintVertical_bias="0.537" />
+
+            <ImageView
+                android:id="@+id/img_temperature"
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:src="@drawable/icon_temperature_low"
+                card_view:layout_constraintBottom_toBottomOf="parent"
+                card_view:layout_constraintEnd_toEndOf="@+id/fridge_name"
+                card_view:layout_constraintHorizontal_bias="0.0"
+                card_view:layout_constraintStart_toStartOf="@+id/fridge_name"
+                card_view:layout_constraintTop_toTopOf="parent"
+                card_view:layout_constraintVertical_bias="0.537" />
+
+            <TextView
+                android:id="@+id/humidity"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:text="13%"
+                android:textSize="16dp"
+                card_view:layout_constraintBottom_toBottomOf="@+id/img_humidity"
+                card_view:layout_constraintEnd_toEndOf="parent"
+                card_view:layout_constraintHorizontal_bias="0.0"
+                card_view:layout_constraintStart_toEndOf="@+id/img_humidity"
+                card_view:layout_constraintTop_toTopOf="@+id/img_humidity"
+                card_view:layout_constraintVertical_bias="0.0" />
+
+            <ImageView
+                android:id="@+id/img_humidity"
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:src="@drawable/icon_weather_humidity"
+                card_view:layout_constraintBottom_toBottomOf="parent"
+                card_view:layout_constraintEnd_toEndOf="@+id/img_temperature"
+                card_view:layout_constraintHorizontal_bias="0.0"
+                card_view:layout_constraintStart_toStartOf="@+id/img_temperature"
+                card_view:layout_constraintTop_toTopOf="parent"
+                card_view:layout_constraintVertical_bias="0.8" />
+
+            <ImageView
+                android:id="@+id/img_color"
+                android:layout_width="60dp"
+                android:layout_height="25dp"
+                android:src="@drawable/yellow"
+                card_view:layout_constraintBottom_toBottomOf="@+id/fridge_name"
+                card_view:layout_constraintEnd_toEndOf="parent"
+                card_view:layout_constraintHorizontal_bias="0.816"
+                card_view:layout_constraintStart_toEndOf="@+id/fridge_name"
+                card_view:layout_constraintTop_toTopOf="@+id/fridge_name"
+                card_view:layout_constraintVertical_bias="0.0" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+
+    </androidx.cardview.widget.CardView>
+</androidx.constraintlayout.widget.ConstraintLayout>

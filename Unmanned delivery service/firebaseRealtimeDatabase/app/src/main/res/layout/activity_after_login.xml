@@ -19,33 +19,20 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.083" />
 
+
     <Button
         android:id="@+id/bt_yes"
         android:layout_width="70dp"
         android:layout_height="50dp"
         android:text="Yes"
         android:visibility="invisible"
-        app:backgroundTint = "#000000"
+        app:backgroundTint="#000000"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.287"
+        app:layout_constraintHorizontal_bias="0.498"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/tv_alarm"
-        app:layout_constraintVertical_bias="0.063" />
-
-    <Button
-        android:id="@+id/bt_no"
-        android:layout_width="70dp"
-        android:layout_height="50dp"
-        android:text="No"
-        android:visibility="invisible"
-        app:backgroundTint = "#000000"
-        app:layout_constraintBottom_toBottomOf="@+id/bt_yes"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.678"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/bt_yes"
-        app:layout_constraintVertical_bias="0.0" />
+        app:layout_constraintVertical_bias="0.064" />
 
     <TextView
         android:id="@+id/textView2"
@@ -96,7 +83,7 @@
         android:gravity="center"
         android:visibility="invisible"
         android:background="@drawable/textview_cus"
-        android:text="등록되지 않은 사용자가 해제를 시도 하였습니다.\n잠금해제를 허용 하시겠습니까?"
+        android:text="비밀번호 입력에 실패하였습니다."
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.495"
