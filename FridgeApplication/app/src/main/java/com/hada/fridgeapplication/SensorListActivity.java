@@ -37,25 +37,23 @@ public class SensorListActivity extends AppCompatActivity {
         // RecyclerView에 정의한 Adapter를 연결
         rv_layout.setAdapter(new SensorAdapter(data, this,width,height));
 
-//// ========== SwipeRefresh 정의 영역 ==========
-//
-//        final SwipeRefreshLayout swipe_refresh = findViewById(R.id.swiperefreshlayout_detail);
-//        final Context context = this;
-//        swipe_refresh.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
-//            @Override
-//            public void onRefresh() {
-//                if(swtich_bool) rv_layout.setLayoutManager(new LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false));
-//                else rv_layout.setLayoutManager(new GridLayoutManager(context, 2));
-//                swtich_bool = !swtich_bool;
-//                swipe_refresh.setRefreshing(false);
-//            }
-//        });
+// ========== SwipeRefresh 정의 영역 ==========
+
+        final SwipeRefreshLayout swipe_refresh = findViewById(R.id.swipe);
+        final Context context = this;
+        swipe_refresh.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                rv_layout.setLayoutManager(new LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false));
+                swipe_refresh.setRefreshing(false);
+            }
+        });
     }
     // ========== 테스트용 데이터 정의 영역 ==========
     ArrayList<SensorModel> data = new ArrayList<SensorModel>(Arrays.asList(
-            new SensorModel("2번 냉장고 온습도 센서","12.4","39",1 ),
-            new SensorModel("3번 냉장고 온습도 센서","13","32",2 ),
-            new SensorModel("4번 냉장고 온습도 센서","11","30",0 )
+            new SensorModel(2,"2번 냉장고 온습도 센서","12.4","39",1 ),
+            new SensorModel(3,"3번 냉장고 온습도 센서","13","32",2 ),
+            new SensorModel(5,"4번 냉장고 온습도 센서","11","30",0 )
 
     ));
 }

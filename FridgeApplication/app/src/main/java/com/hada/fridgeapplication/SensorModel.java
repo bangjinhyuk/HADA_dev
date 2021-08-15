@@ -1,16 +1,26 @@
 package com.hada.fridgeapplication;
 
 public class SensorModel {
+    private int id;
     private String sensorName;
     private String temperature;
     private String humidity;
     private int status;
 
-    public SensorModel(String sensorName, String temperature, String humidity, int status) {
+    public SensorModel(int id, String sensorName, String temperature, String humidity, int status) {
+        this.id = id;
         this.sensorName = sensorName;
         this.temperature = temperature;
         this.humidity = humidity;
         this.status = status;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
     }
 
     public String getSensorName() {
