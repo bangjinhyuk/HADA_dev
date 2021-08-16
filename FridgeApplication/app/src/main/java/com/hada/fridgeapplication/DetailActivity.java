@@ -24,7 +24,7 @@ import java.util.List;
 public class DetailActivity extends AppCompatActivity {
     private TextView detail_title;
     private LineChart lineChart;
-    private ImageView detail_tempbt, detail_humibt;
+    private ImageView detail_tempbt, detail_humibt, detail_alim;
     private boolean detailbt = true;
     private String TAG = "DetailActivity";
     @Override
@@ -35,7 +35,7 @@ public class DetailActivity extends AppCompatActivity {
         detail_title = findViewById(R.id.detail_title);
         detail_tempbt = findViewById(R.id.detail_tempbt);
         detail_humibt = findViewById(R.id.detail_humibt);
-
+        detail_alim = findViewById(R.id.detail_alim);
 
         Intent getintent = getIntent();
         detail_title.setText(getintent.getExtras().getString("title"));
@@ -135,6 +135,15 @@ public class DetailActivity extends AppCompatActivity {
                     detail_humibt.setImageResource(R.drawable.click_humi_tab);
                     detailbt = false;
                 }
+            }
+        });
+
+        detail_alim.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(v.getContext(), AlimPopup.class);
+                intent.putExtra("data", "Test Popup");
+                v.getContext().startActivity(intent);
             }
         });
 
