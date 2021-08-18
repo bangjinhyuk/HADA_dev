@@ -18,6 +18,7 @@
         app:layout_constraintVertical_bias="0.0">
 
         <ImageView
+            android:id="@+id/detail_back"
             android:layout_width="28dp"
             android:layout_height="28dp"
             android:src="@drawable/backbt"
@@ -44,6 +45,7 @@
             app:layout_constraintTop_toTopOf="parent" />
 
         <ImageView
+            android:id="@+id/detail_modify_title"
             android:layout_width="28dp"
             android:layout_height="28dp"
             android:src="@drawable/modify"

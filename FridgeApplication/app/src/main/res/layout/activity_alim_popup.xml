@@ -25,7 +25,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="80dp"
         app:bar_color="#ebebeb"
-        app:bar_highlight_color="#7CEBEBEB"
+        app:bar_highlight_color="#0ba3de"
         app:corner_radius="10"
         app:data_type="_integer"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -40,7 +40,7 @@
         app:min_value="-30"
         app:right_thumb_image="@drawable/knob"
         app:right_thumb_image_pressed="@drawable/knob"
-        app:steps="5" />
+        app:steps="1" />
 
     <TextView
         android:id="@+id/temperature_popup"
@@ -66,7 +66,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="210dp"
         app:bar_color="#ebebeb"
-        app:bar_highlight_color="#7CEBEBEB"
+        app:bar_highlight_color="#0ba3de"
         app:corner_radius="10"
         app:data_type="_integer"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -81,7 +81,7 @@
         app:min_value="0"
         app:right_thumb_image="@drawable/knob"
         app:right_thumb_image_pressed="@drawable/knob"
-        app:steps="5" />
+        app:steps="1" />
 
     <TextView
         android:id="@+id/humidity_popup"
