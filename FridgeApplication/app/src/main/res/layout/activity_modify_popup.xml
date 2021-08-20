@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="300dp"
     android:layout_height="200dp"
-    android:background="#e1e6ee"
+    android:background="@drawable/corner_layout"
     tools:context=".ModifyPopup">
 
     <TextView
@@ -22,12 +22,13 @@
         app:layout_constraintVertical_bias="0.14999998" />
 
     <EditText
-        android:id="@+id/editText"
+        android:id="@+id/modify_text"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginLeft="30dp"
         android:layout_marginRight="30dp"
         android:textSize="15sp"
+        android:singleLine="true"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -40,7 +41,8 @@
         android:layout_height="50dp"
         android:text="확인"
         android:textSize="15sp"
-        android:background="#0ba3de"
+        android:background="@drawable/blue_button_corner_layout"
+
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"

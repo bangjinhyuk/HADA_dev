@@ -4,10 +4,15 @@
     <option name="filePathToZoomLevelMap">
       <map>
         <entry key="../../../../../../../layout/custom_preview.xml" value="0.42314814814814816" />
+        <entry key="app/src/main/res/drawable/blue_button_corner_layout.xml" value="0.29270833333333335" />
+        <entry key="app/src/main/res/drawable/blue_corner_layout.xml" value="0.29270833333333335" />
+        <entry key="app/src/main/res/drawable/corner_layout.xml" value="0.29270833333333335" />
+        <entry key="app/src/main/res/drawable/detail_layout.xml" value="0.29270833333333335" />
         <entry key="app/src/main/res/layout/activity_alim_popup.xml" value="0.2740628166160081" />
-        <entry key="app/src/main/res/layout/activity_detail.xml" value="0.2740628166160081" />
+        <entry key="app/src/main/res/layout/activity_detail.xml" value="0.47342398022249693" />
         <entry key="app/src/main/res/layout/activity_modify.xml" value="0.2604166666666667" />
         <entry key="app/src/main/res/layout/activity_modify_popup.xml" value="0.24635416666666668" />
+        <entry key="app/src/main/res/layout/activity_sensor_list.xml" value="0.17346014492753623" />
         <entry key="app/src/main/res/layout/sensor_list.xml" value="0.15628166160081053" />
       </map>
     </option>
