@@ -14,6 +14,7 @@ import android.os.BatteryManager;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.DatePicker;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -26,8 +27,15 @@ import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.LineData;
 import com.github.mikephil.charting.data.LineDataSet;
 
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
+import java.util.StringTokenizer;
 
 public class DetailActivity extends AppCompatActivity {
     private TextView detail_title, detail_date;
@@ -35,13 +43,15 @@ public class DetailActivity extends AppCompatActivity {
     private ImageView detail_tempbt, detail_humibt, detail_alim, detail_battery_1, detail_battery_2, detail_modify_title, detail_back, detail_calender;
     private boolean detailbt = true;
     private String TAG = "DetailActivity";
-    private ActivityResultLauncher<Intent> alim_resultLauncher,modify_resultLauncher;
+    private ActivityResultLauncher<Intent> alim_resultLauncher,modify_resultLauncher, calendar_resultLauncher;
+    private Long now;
+    private Date date;
+    private DateFormat dateFormat;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_detail);
-
         detail_title = findViewById(R.id.detail_title);
         detail_tempbt = findViewById(R.id.detail_tempbt);
         detail_humibt = findViewById(R.id.detail_humibt);
@@ -50,7 +60,15 @@ public class DetailActivity extends AppCompatActivity {
         detail_battery_2 = findViewById(R.id.detail_battery_2);
         detail_modify_title = findViewById(R.id.detail_modify_title);
         detail_back = findViewById(R.id.detail_back);
-
+        detail_calender = findViewById(R.id.detail_calender);
+        detail_date = findViewById(R.id.detail_date);
+        now = System.currentTimeMillis();
+        date = new Date(now);
+        dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+        String df = dateFormat.format(date);
+        //오늘 날짜 받아서 저장
+        Log.d(TAG, "onCreate: currentTimeMillis"+now);
+//
         Intent getintent = getIntent();
         detail_title.setText(getintent.getExtras().getString("title"));
 
@@ -224,14 +242,55 @@ public class DetailActivity extends AppCompatActivity {
                 }
             }
         });
-        //Todo: 캘린더 뷰 띄우기
+        //Todo: calender view
         detail_calender.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                Intent intent = new Intent(v.getContext(),CalendarPopup.class)
+                        .putExtra("date",date.getTime());
+                calendar_resultLauncher.launch(intent);
 
             }
         });
 
+        //Todo: get databases -date entity
+        calendar_resultLauncher = registerForActivityResult(
+                new ActivityResultContracts.StartActivityForResult(),
+                new ActivityResultCallback<ActivityResult>() {
+                    @Override
+                    public void onActivityResult(ActivityResult result) {
+                        Log.d(TAG, "onActivityResult: calendar_resultLauncher");
+                        if(result.getResultCode() == RESULT_OK){
+
+                            setDate(new Date(result.getData().getExtras().getLong("date")));
+                            Log.d(TAG, "onActivityResult: getResult" + new Date(getNow()));
+                            StringTokenizer st1 = new StringTokenizer(dateFormat.format(date),"-");
+                            StringTokenizer st2 = new StringTokenizer(dateFormat.format(new Date(now)),"-");
+                            if (st1.nextToken().equals(st2.nextToken())&&
+                                    st1.nextToken().equals(st2.nextToken())&&
+                                    st1.nextToken().equals(st2.nextToken())) detail_date.setText("• 실시간 그래프");
+                            else detail_date.setText("• "+dateFormat.format(date));
+                        }else Log.e(TAG,"onActivityResult: calendar_resultLauncher cancel");
+                    }
+                }
+        );
+
+
     }
 
+    public Date getDate() {
+        return date;
+    }
+
+    public void setDate(Date date) {
+        this.date = date;
+    }
+
+    public Long getNow() {
+        return now;
+    }
+
+    public void setNow(Long now) {
+        this.now = now;
+    }
 }
