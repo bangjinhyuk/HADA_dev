@@ -1,5 +1,6 @@
 package com.hada.fridgeapplication;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -9,13 +10,27 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 import android.content.Context;
 import android.graphics.Point;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Display;
+
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.FirebaseApp;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 
 public class SensorListActivity extends AppCompatActivity {
-    Boolean swtich_bool = false;
+    private DatabaseReference mDatabase;
+    private Boolean tmp = true;
+    private int tmpNum = 1;
+    private ArrayList<SensorModel> data = new ArrayList<SensorModel>();
+    private Context context;
+    private RecyclerView rv_layout;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -27,17 +42,41 @@ public class SensorListActivity extends AppCompatActivity {
         display.getRealSize(size); // or getSize(size)
         int width = size.x;
         int height = size.y;
-
+        context = getApplicationContext();
 
         // ========== RecyclerView 연결 영역 ==========
+        rv_layout = findViewById(R.id.recyclerview_detail);
 
-        final RecyclerView rv_layout = findViewById(R.id.recyclerview_detail);
-        // RecyclerView의 레이아웃 매니저를 통해 레이아웃 정의
-        rv_layout.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
-        // RecyclerView에 정의한 Adapter를 연결
-        rv_layout.setAdapter(new SensorAdapter(data, this,width,height));
+        FirebaseApp.initializeApp(getApplicationContext());
+        mDatabase = FirebaseDatabase.getInstance().getReference("school1");
+        mDatabase.get().addOnCompleteListener(new OnCompleteListener<DataSnapshot>() {
+                @Override
+                public void onComplete(@NonNull Task<DataSnapshot> task) {
+                    if (task.isSuccessful()) {
 
-// ========== SwipeRefresh 정의 영역 ==========
+                        for(int i = 1;i<100;i++){
+                            if(task.getResult().hasChild(""+i)){
+                                Log.d("firebase", "data"+ task.getResult().child(""+i).getValue());
+                                SensorModel value = task.getResult().child(""+i).getValue(SensorModel.class);
+                                value.setId(i);
+                                Log.d("firebase", "value"+value);
+
+                                data.add(value);
+                            }
+                        }
+                        // RecyclerView의 레이아웃 매니저를 통해 레이아웃 정의
+                        rv_layout.setLayoutManager(new LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false));
+                        // RecyclerView에 정의한 Adapter를 연결
+                        rv_layout.setAdapter(new SensorAdapter(data, context));
+
+                    } else {
+                        Log.e("firebase", "Error getting data", task.getException());
+                    }
+                }
+            });
+
+
+        // ========== SwipeRefresh 정의 영역 ==========
 
         final SwipeRefreshLayout swipe_refresh = findViewById(R.id.swipe);
         final Context context = this;
@@ -48,13 +87,8 @@ public class SensorListActivity extends AppCompatActivity {
                 swipe_refresh.setRefreshing(false);
             }
         });
-    }
-    // ========== 테스트용 데이터 정의 영역 ==========
-    ArrayList<SensorModel> data = new ArrayList<SensorModel>(Arrays.asList(
-            new SensorModel(2,"2번 냉장고 온습도 센서","12.4","39",1 ),
-            new SensorModel(3,"3번 냉장고 온습도 센서","13","32",2 ),
-            new SensorModel(5,"4번 냉장고 온습도 센서","11","30",0 )
 
-    ));
+    }
+
 }
 
