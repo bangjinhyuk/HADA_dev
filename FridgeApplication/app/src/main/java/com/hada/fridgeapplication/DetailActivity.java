@@ -58,6 +58,7 @@ public class DetailActivity extends AppCompatActivity {
     private DateFormat dateFormat;
     private DatabaseReference mDatabase;
     private String sensorID;
+    private int temp_minValue = -30,temp_maxValue =30,humi_minValue= 0,humi_maxValue = 100;
 
 
     @Override
@@ -112,6 +113,15 @@ public class DetailActivity extends AppCompatActivity {
                 else if(Integer.parseInt(snapshot.child(sensorID).child("bat2").getValue()+"")>40) detail_battery_2.setImageResource(R.drawable.battery_normal);
                 else if(Integer.parseInt(snapshot.child(sensorID).child("bat2").getValue()+"")>10) detail_battery_2.setImageResource(R.drawable.battery_low);
                 else detail_battery_2.setImageResource(R.drawable.battery_empty);
+
+                if(!snapshot.child(sensorID).child("tempRange").getValue().equals("")&&!snapshot.child(sensorID).child("humiRange").getValue().equals("")) {
+                    StringTokenizer tr = new StringTokenizer(snapshot.child(sensorID).child("tempRange").getValue() + "", "~");
+                    StringTokenizer hr = new StringTokenizer(snapshot.child(sensorID).child("humiRange").getValue() + "", "~");
+                    temp_minValue = Integer.parseInt(tr.nextToken());
+                    temp_maxValue = Integer.parseInt(tr.nextToken());
+                    humi_minValue = Integer.parseInt(hr.nextToken());
+                    humi_maxValue = Integer.parseInt(hr.nextToken());
+                }
             }
 
             @Override
@@ -168,9 +178,6 @@ public class DetailActivity extends AppCompatActivity {
                         Log.d(TAG, "onActivityResult: alim_resultLauncher");
                         if(result.getResultCode() == RESULT_OK){
                             Log.d(TAG, "onActivityResult: resultLauncher ok");
-
-
-
                             Log.d(TAG, "onActivityResult: temp_minValue "+result.getData().getExtras().getInt("temp_minValue",0));
                             Log.d(TAG, "onActivityResult: temp_maxValue "+result.getData().getExtras().getInt("temp_maxValue",0));
                             Log.d(TAG, "onActivityResult: humi_minValue "+result.getData().getExtras().getInt("humi_minValue",0));
@@ -185,10 +192,11 @@ public class DetailActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(v.getContext(), AlimPopup.class);
-                intent.putExtra("temp_minValue", -12);
-                intent.putExtra("temp_maxValue", 12);
-                intent.putExtra("humi_minValue", 12);
-                intent.putExtra("humi_maxValue", 24);
+                intent.putExtra("id",sensorID);
+                intent.putExtra("temp_minValue", temp_minValue);
+                intent.putExtra("temp_maxValue", temp_maxValue);
+                intent.putExtra("humi_minValue", humi_minValue);
+                intent.putExtra("humi_maxValue", humi_maxValue);
                 alim_resultLauncher.launch(intent);
             }
         });

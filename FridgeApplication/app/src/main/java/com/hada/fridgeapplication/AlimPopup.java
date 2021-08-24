@@ -17,6 +17,9 @@ import android.widget.TextView;
 
 import com.crystal.crystalrangeseekbar.interfaces.OnRangeSeekbarChangeListener;
 import com.crystal.crystalrangeseekbar.widgets.CrystalRangeSeekbar;
+import com.google.firebase.FirebaseApp;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 
 public class AlimPopup extends Activity {
 
@@ -25,6 +28,7 @@ public class AlimPopup extends Activity {
     private ImageView alim_cancel,alim_set;
     private int temp_minValue,temp_maxValue,humi_minValue,humi_maxValue;
     private String TAG= "AlimPopup";
+    private DatabaseReference mDatabase;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -33,6 +37,9 @@ public class AlimPopup extends Activity {
         setContentView(R.layout.activity_alim_popup);
         getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
 
+        FirebaseApp.initializeApp(getApplicationContext());
+        mDatabase = FirebaseDatabase.getInstance().getReference("school1");
+
         range_temp = findViewById(R.id.range_temp);
         range_humi = findViewById(R.id.range_humi);
         temperature_popup = findViewById(R.id.temperature_popup);
@@ -40,13 +47,13 @@ public class AlimPopup extends Activity {
         alim_cancel = findViewById(R.id.alim_cancel);
         alim_set = findViewById(R.id.alim_set);
 
-        Intent intent = getIntent();
+        Intent getintent = getIntent();
 
-        range_temp.setMinStartValue(intent.getExtras().getInt("temp_minValue",0))
-                .setMaxStartValue(intent.getExtras().getInt("temp_maxValue",0))
+        range_temp.setMinStartValue(getintent.getExtras().getInt("temp_minValue",0))
+                .setMaxStartValue(getintent.getExtras().getInt("temp_maxValue",0))
                 .apply();
-        range_humi.setMinStartValue(intent.getExtras().getInt("humi_minValue",0))
-                .setMaxStartValue(intent.getExtras().getInt("humi_maxValue",0))
+        range_humi.setMinStartValue(getintent.getExtras().getInt("humi_minValue",0))
+                .setMaxStartValue(getintent.getExtras().getInt("humi_maxValue",0))
                 .apply();
 
 
@@ -71,6 +78,17 @@ public class AlimPopup extends Activity {
         alim_set.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                mDatabase.child(getintent
+                                .getExtras()
+                                .getString("id"))
+                        .child("tempRange")
+                        .setValue(temp_minValue+"~"+temp_maxValue);
+                mDatabase.child(getintent
+                                .getExtras()
+                                .getString("id"))
+                        .child("humiRange")
+                        .setValue(humi_minValue+"~"+humi_maxValue);
+
                 Intent intent = new Intent(getApplicationContext(), DetailActivity.class)
                         .putExtra("temp_minValue", temp_minValue)
                         .putExtra("temp_maxValue", temp_maxValue)
