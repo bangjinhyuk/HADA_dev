@@ -7,17 +7,24 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.Window;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ImageView;
 import android.widget.Toast;
+
+import com.google.firebase.FirebaseApp;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+
 
 public class ModifyPopup extends Activity {
     private EditText modify_text;
     private Button modify_ok;
+    private DatabaseReference mDatabase;
+    private String sensorID;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -26,8 +33,13 @@ public class ModifyPopup extends Activity {
         setContentView(R.layout.activity_modify_popup);
         getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
 
+        FirebaseApp.initializeApp(getApplicationContext());
         modify_text = findViewById(R.id.modify_text);
         modify_ok = findViewById(R.id.modify_ok);
+        mDatabase = FirebaseDatabase.getInstance().getReference("school1");
+
+        Intent getIntent = getIntent();
+        sensorID = getIntent.getExtras().getString("id");
 
         modify_ok.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -36,6 +48,7 @@ public class ModifyPopup extends Activity {
                     if (modify_text.getText().toString().length()>20) Toast.makeText(v.getContext(),"20자 이내로 적어주세요",Toast.LENGTH_LONG).show();
                     else{
                         //TODO: 서버에 이름 넣기
+                        mDatabase.child(sensorID).child("sensorName").setValue(modify_text.getText().toString());
                         Intent intent = new Intent(getApplicationContext(),DetailActivity.class)
                                 .putExtra("modify_name",modify_text.getText().toString());
                         setResult(RESULT_OK,intent);

@@ -4,6 +4,7 @@ import androidx.activity.result.ActivityResult;
 import androidx.activity.result.ActivityResultCallback;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Context;
@@ -26,6 +27,14 @@ import com.github.mikephil.charting.components.YAxis;
 import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.LineData;
 import com.github.mikephil.charting.data.LineDataSet;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.FirebaseApp;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 import java.text.DateFormat;
 import java.text.ParseException;
@@ -38,7 +47,7 @@ import java.util.List;
 import java.util.StringTokenizer;
 
 public class DetailActivity extends AppCompatActivity {
-    private TextView detail_title, detail_date;
+    private TextView detail_title, detail_date,detail_hum,detail_tem;
     private LineChart lineChart;
     private ImageView detail_tempbt, detail_humibt, detail_alim, detail_battery_1, detail_battery_2, detail_modify_title, detail_back, detail_calender;
     private boolean detailbt = true;
@@ -47,6 +56,9 @@ public class DetailActivity extends AppCompatActivity {
     private Long now;
     private Date date;
     private DateFormat dateFormat;
+    private DatabaseReference mDatabase;
+    private String sensorID;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -62,15 +74,52 @@ public class DetailActivity extends AppCompatActivity {
         detail_back = findViewById(R.id.detail_back);
         detail_calender = findViewById(R.id.detail_calender);
         detail_date = findViewById(R.id.detail_date);
+        detail_hum = findViewById(R.id.detail_hum);
+        detail_tem = findViewById(R.id.detail_tem);
+
+        FirebaseApp.initializeApp(getApplicationContext());
+        mDatabase = FirebaseDatabase.getInstance().getReference("school1");
+
+
         now = System.currentTimeMillis();
         date = new Date(now);
         dateFormat = new SimpleDateFormat("yyyy-MM-dd");
         String df = dateFormat.format(date);
         //오늘 날짜 받아서 저장
         Log.d(TAG, "onCreate: currentTimeMillis"+now);
-//
+
+        //파이어베이스에서 값 가져오기
         Intent getintent = getIntent();
-        detail_title.setText(getintent.getExtras().getString("title"));
+        sensorID = getintent.getExtras().getString("id");
+
+        mDatabase.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                detail_title.setText(String.valueOf(snapshot.child(sensorID).child("sensorName").getValue()));
+                detail_hum.setText(String.valueOf(snapshot.child(sensorID).child("humi").getValue()+"%"));
+                detail_tem.setText(String.valueOf(snapshot.child(sensorID).child("temp").getValue()+"℃"));
+
+
+                //Todo: get database -battery 1
+
+                if(Integer.parseInt(snapshot.child(sensorID).child("bat1").getValue()+"")>80) detail_battery_1.setImageResource(R.drawable.battery_high);
+                else if(Integer.parseInt(snapshot.child(sensorID).child("bat1").getValue()+"")>40) detail_battery_1.setImageResource(R.drawable.battery_normal);
+                else if(Integer.parseInt(snapshot.child(sensorID).child("bat1").getValue()+"")>10) detail_battery_1.setImageResource(R.drawable.battery_low);
+                else detail_battery_1.setImageResource(R.drawable.battery_empty);
+
+                //Todo: get database -battery 1
+                if(Integer.parseInt(snapshot.child(sensorID).child("bat2").getValue()+"")>80) detail_battery_2.setImageResource(R.drawable.battery_high);
+                else if(Integer.parseInt(snapshot.child(sensorID).child("bat2").getValue()+"")>40) detail_battery_2.setImageResource(R.drawable.battery_normal);
+                else if(Integer.parseInt(snapshot.child(sensorID).child("bat2").getValue()+"")>10) detail_battery_2.setImageResource(R.drawable.battery_low);
+                else detail_battery_2.setImageResource(R.drawable.battery_empty);
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+
 
         lineChart = (LineChart)findViewById(R.id.chart);
 
@@ -92,7 +141,7 @@ public class DetailActivity extends AppCompatActivity {
         detail_modify_title.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(v.getContext(),ModifyPopup.class);
+                Intent intent = new Intent(v.getContext(),ModifyPopup.class).putExtra("id",sensorID);
                 modify_resultLauncher.launch(intent);
             }
         });
@@ -105,7 +154,7 @@ public class DetailActivity extends AppCompatActivity {
                         Log.d(TAG, "onActivityResult: modify_resultLauncher");
                         if(result.getResultCode() == RESULT_OK){
                             Log.d(TAG, "onActivityResult: resultLauncher ok");
-                            detail_title.setText(result.getData().getExtras().getString("modify_name"));
+//                            detail_title.setText(result.getData().getExtras().getString("modify_name"));
                         }else Log.e(TAG,"onActivityResult: resultLauncher cancel");
                     }
                 });
@@ -144,9 +193,6 @@ public class DetailActivity extends AppCompatActivity {
             }
         });
 
-        //Todo: get database -battery 1
-
-        //Todo: get database -battery 1
 
 
 

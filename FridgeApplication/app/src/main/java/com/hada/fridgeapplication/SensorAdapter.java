@@ -1,5 +1,7 @@
 package com.hada.fridgeapplication;
 
+import static android.content.Intent.FLAG_ACTIVITY_NEW_TASK;
+
 import android.content.Context;
 import android.content.Intent;
 import android.nfc.Tag;
@@ -90,7 +92,6 @@ public class SensorAdapter extends RecyclerView.Adapter<SensorAdapter.ViewHolder
                         holder.sensor_color.setImageResource(R.drawable.green);
                     }else holder.sensor_color.setImageResource(R.drawable.red);
                 }else holder.sensor_color.setImageResource(R.drawable.yellow);
-
             }
 
             @Override
@@ -108,7 +109,7 @@ public class SensorAdapter extends RecyclerView.Adapter<SensorAdapter.ViewHolder
                {
                    Intent intent = new Intent(holder.itemView.getContext(),DetailActivity.class);
                    intent.putExtra("id",Integer.toString(data.get(pos).getId()));
-                   holder.itemView.getContext().startActivity(intent);
+                   holder.itemView.getContext().startActivity(intent.addFlags(FLAG_ACTIVITY_NEW_TASK));
                    Log.d(TAG, Integer.toString(data.get(pos).getId()));
 
                }
