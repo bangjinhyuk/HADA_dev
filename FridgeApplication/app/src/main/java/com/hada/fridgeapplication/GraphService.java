@@ -31,7 +31,7 @@ public class GraphService {
 //        lineDataSet.setDrawCircleHole(false);
 //        lineDataSet.setDrawCircles(false);
         lineDataSet.setDrawHighlightIndicators(true);
-        lineDataSet.setDrawValues(true);
+        lineDataSet.setDrawValues(false);
         lineDataSet.setCubicIntensity(0.3f);
         lineDataSet.setDrawFilled(true);
         lineDataSet.setDrawCircles(false);
@@ -50,11 +50,11 @@ public class GraphService {
         XAxis xAxis = lineChart.getXAxis();
         xAxis.setPosition(XAxis.XAxisPosition.TOP);
         xAxis.setTextColor(Color.BLACK);
-        xAxis.enableGridDashedLine(8, 10, 0);
+        xAxis.enableGridDashedLine(8, 30, 0);
 
         YAxis yLAxis = lineChart.getAxisLeft();
-//        yLAxis.setTextColor(Color.BLACK);
-        yLAxis.setDrawLabels(false);
+        yLAxis.setTextColor(Color.BLACK);
+        yLAxis.setDrawLabels(true);
         yLAxis.setDrawAxisLine(false);
         yLAxis.setDrawGridLines(false);
         YAxis yRAxis = lineChart.getAxisRight();

@@ -41,7 +41,9 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.StringTokenizer;
@@ -59,6 +61,10 @@ public class DetailActivity extends AppCompatActivity {
     private DatabaseReference mDatabase;
     private String sensorID;
     private int temp_minValue = -30,temp_maxValue =30,humi_minValue= 0,humi_maxValue = 100;
+    private List<Entry> entries;
+    private ArrayList sortEntryList;
+    private ValueEventListener valueEventListener;
+
 
 
     @Override
@@ -78,6 +84,12 @@ public class DetailActivity extends AppCompatActivity {
         detail_hum = findViewById(R.id.detail_hum);
         detail_tem = findViewById(R.id.detail_tem);
 
+        lineChart = (LineChart)findViewById(R.id.chart);
+
+        GraphService graphService = new GraphService(lineChart);
+
+        lineChart.getLegend().setEnabled(false);
+
         FirebaseApp.initializeApp(getApplicationContext());
         mDatabase = FirebaseDatabase.getInstance().getReference("school1");
 
@@ -92,8 +104,7 @@ public class DetailActivity extends AppCompatActivity {
         //파이어베이스에서 값 가져오기
         Intent getintent = getIntent();
         sensorID = getintent.getExtras().getString("id");
-
-        mDatabase.addValueEventListener(new ValueEventListener() {
+        mDatabase.addValueEventListener(valueEventListener = new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 detail_title.setText(String.valueOf(snapshot.child(sensorID).child("sensorName").getValue()));
@@ -114,7 +125,7 @@ public class DetailActivity extends AppCompatActivity {
                 else if(Integer.parseInt(snapshot.child(sensorID).child("bat2").getValue()+"")>10) detail_battery_2.setImageResource(R.drawable.battery_low);
                 else detail_battery_2.setImageResource(R.drawable.battery_empty);
 
-                if(!snapshot.child(sensorID).child("tempRange").getValue().equals("")&&!snapshot.child(sensorID).child("humiRange").getValue().equals("")) {
+                if(snapshot.child(sensorID).child("tempRange").getValue()!=null&&snapshot.child(sensorID).child("humiRange").getValue()!=null) {
                     StringTokenizer tr = new StringTokenizer(snapshot.child(sensorID).child("tempRange").getValue() + "", "~");
                     StringTokenizer hr = new StringTokenizer(snapshot.child(sensorID).child("humiRange").getValue() + "", "~");
                     temp_minValue = Integer.parseInt(tr.nextToken());
@@ -122,6 +133,63 @@ public class DetailActivity extends AppCompatActivity {
                     humi_minValue = Integer.parseInt(hr.nextToken());
                     humi_maxValue = Integer.parseInt(hr.nextToken());
                 }
+
+
+                StringTokenizer nowst = new StringTokenizer(dateFormat.format(date),"-");
+                String tmp;
+                String year = nowst.nextToken();
+                String month = (tmp = nowst.nextToken()).startsWith("0")? tmp.replaceFirst("0","") : tmp;
+                String day = (tmp = nowst.nextToken()).startsWith("0")? tmp.replaceFirst("0","") : tmp;
+                String set;
+                int rgb;
+                if (snapshot.child(sensorID).child("tempset").child(month+'-'+day+'-'+year).getValue()!=null&&
+                        snapshot.child(sensorID).child("humiset").child(month+'-'+day+'-'+year).getValue()!=null) {
+                    if (detailbt) {
+                        set = String.valueOf(snapshot.child(sensorID).child("tempset").child(month + '-' + day + '-' + year).getValue());
+                        detail_tempbt.setImageResource(R.drawable.click_temp_tab);
+                        detail_humibt.setImageResource(R.drawable.humi_tab);
+                        rgb = Color.rgb(153, 153, 255);
+                    } else {
+                        set = String.valueOf(snapshot.child(sensorID).child("humiset").child(month + '-' + day + '-' + year).getValue());
+                        detail_tempbt.setImageResource(R.drawable.temp_tab);
+                        detail_humibt.setImageResource(R.drawable.click_humi_tab);
+                        rgb = Color.rgb(162, 225, 199);
+                    }
+                    set = set.replaceAll("\\{", "").replaceAll("\\}", "");
+
+
+                    entries = new ArrayList<>();
+                    sortEntryList = new ArrayList();
+
+                    StringTokenizer setk = new StringTokenizer(set, ","); //데이터 하나씩 분류
+                    float hour;
+                    float min;
+                    float sec;
+                    String apm;
+                    int setkNum = setk.countTokens();
+                    for (int i = 0; i < setkNum; i++) {
+                        StringTokenizer datatk = new StringTokenizer(setk.nextToken(), "=");
+                        StringTokenizer timetk = new StringTokenizer(datatk.nextToken(), ":");
+                        hour = Float.parseFloat(timetk.nextToken());
+                        min = Float.parseFloat(timetk.nextToken());
+                        StringTokenizer sectk = new StringTokenizer(timetk.nextToken(), " ");
+                        sec = Float.parseFloat(sectk.nextToken());
+                        apm = sectk.nextToken();
+                        if (apm.equals("PM")) hour += 12;
+                        //Todo: 시분초로 0~24 사잇값으로 만들어 datatk.nextToken값과 함께 entry 저장
+                        sortEntryList.add(new SortEntry(hour + (min / 60f) + (sec / 3600f), Float.parseFloat(datatk.nextToken())));
+                    }
+                    Collections.sort(sortEntryList);
+                    for (Object sortEntry : sortEntryList) {
+                        System.out.println(sortEntry);
+                        entries.add(new Entry(((SortEntry) sortEntry).getTime(), ((SortEntry) sortEntry).getData()));
+                    }
+
+
+                    graphService.drawGraph(entries, rgb);
+                }else graphService.drawGraph(new ArrayList<>(),Color.rgb(0, 0, 0));
+
+
             }
 
             @Override
@@ -131,11 +199,6 @@ public class DetailActivity extends AppCompatActivity {
         });
 
 
-        lineChart = (LineChart)findViewById(R.id.chart);
-
-        GraphService graphService = new GraphService(lineChart);
-
-        lineChart.getLegend().setEnabled(false);
 
         //뒤로가기 버튼 이벤트
         detail_back.setOnClickListener(new View.OnClickListener() {
@@ -202,71 +265,6 @@ public class DetailActivity extends AppCompatActivity {
         });
 
 
-
-
-        //Todo: get database -entries
-        List<Entry> entries = new ArrayList<>();
-        entries.add(new Entry(0, 1));
-        entries.add(new Entry(1, 1));
-        entries.add(new Entry(2, 2));
-        entries.add(new Entry(3, 0));
-        entries.add(new Entry(4, 4));
-        entries.add(new Entry(5, 3));
-        entries.add(new Entry(6, 3));
-        entries.add(new Entry(7, 3));
-        entries.add(new Entry(8, 3));
-        entries.add(new Entry(9, 3));
-        entries.add(new Entry(10, 3));
-        entries.add(new Entry(11, 3));
-        entries.add(new Entry(12, 3));
-        entries.add(new Entry(13, 3));
-        entries.add(new Entry(14, 3));
-        entries.add(new Entry(15, 3));
-        entries.add(new Entry(16, 2));
-        entries.add(new Entry(17, 1));
-        entries.add(new Entry(18, 0));
-        entries.add(new Entry(19, 3));
-        entries.add(new Entry(20, 4));
-        entries.add(new Entry(21, 5));
-        entries.add(new Entry(22, 6));
-        entries.add(new Entry(23, 7));
-
-        List<Entry> entries1 = new ArrayList<>();
-        entries1.add(new Entry(0, 23));
-        entries1.add(new Entry(1, 23));
-        entries1.add(new Entry(2, 25));
-        entries1.add(new Entry(3, 06));
-        entries1.add(new Entry(4, 46));
-        entries1.add(new Entry(5, 37));
-        entries1.add(new Entry(6, 34));
-        entries1.add(new Entry(7, 32));
-        entries1.add(new Entry(8, 31));
-        entries1.add(new Entry(9, 33));
-        entries1.add(new Entry(10, 36));
-        entries1.add(new Entry(11, 39));
-        entries1.add(new Entry(12, 36));
-        entries1.add(new Entry(13, 35));
-        entries1.add(new Entry(14, 34));
-        entries1.add(new Entry(15, 33));
-        entries1.add(new Entry(16, 32));
-        entries1.add(new Entry(17, 31));
-        entries1.add(new Entry(18, 33));
-        entries1.add(new Entry(19, 34));
-        entries1.add(new Entry(20, 35));
-        entries1.add(new Entry(21, 37));
-        entries1.add(new Entry(22, 38));
-        entries1.add(new Entry(23, 37));
-
-        if (detailbt) {
-            graphService.drawGraph(entries,Color.rgb(153, 153, 255));
-            detail_tempbt.setImageResource(R.drawable.click_temp_tab);
-            detail_humibt.setImageResource(R.drawable.humi_tab);
-        }else{
-//            graphService.drawGraph(entries1,Color.rgb(162, 225, 199),lineChart);
-            detail_tempbt.setImageResource(R.drawable.temp_tab);
-            detail_humibt.setImageResource(R.drawable.click_humi_tab);
-        }
-
         /*
          * 온도 측정 기록 탭 클릭시
          */
@@ -274,9 +272,7 @@ public class DetailActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 if (!detailbt) {
-                    graphService.drawGraph(entries,Color.rgb(153, 153, 255));
-                    detail_tempbt.setImageResource(R.drawable.click_temp_tab);
-                    detail_humibt.setImageResource(R.drawable.humi_tab);
+                    mDatabase.addListenerForSingleValueEvent(valueEventListener);
                     detailbt = true;
 
                 }
@@ -289,9 +285,7 @@ public class DetailActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 if (detailbt) {
-                    graphService.drawGraph(entries1,Color.rgb(162, 225, 199));
-                    detail_tempbt.setImageResource(R.drawable.temp_tab);
-                    detail_humibt.setImageResource(R.drawable.click_humi_tab);
+                    mDatabase.addListenerForSingleValueEvent(valueEventListener);
                     detailbt = false;
                 }
             }
@@ -317,6 +311,7 @@ public class DetailActivity extends AppCompatActivity {
                         if(result.getResultCode() == RESULT_OK){
 
                             setDate(new Date(result.getData().getExtras().getLong("date")));
+                            mDatabase.addListenerForSingleValueEvent(valueEventListener);
                             Log.d(TAG, "onActivityResult: getResult" + new Date(getNow()));
                             StringTokenizer st1 = new StringTokenizer(dateFormat.format(date),"-");
                             StringTokenizer st2 = new StringTokenizer(dateFormat.format(new Date(now)),"-");

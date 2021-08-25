@@ -82,7 +82,7 @@ public class SensorAdapter extends RecyclerView.Adapter<SensorAdapter.ViewHolder
                 holder.humidity.setText(snapshot.child(id+"").child("humi").getValue()+"%");
 //                Log.d(TAG, snapshot.child(id+"").child("tempRange").getValue()+"");
 
-                if(!snapshot.child(id+"").child("tempRange").getValue().equals("")&&!snapshot.child(id+"").child("humiRange").getValue().equals("")){
+                if(snapshot.child(id+"").child("tempRange").getValue()!=null&&snapshot.child(id+"").child("humiRange").getValue()!=null){
                     StringTokenizer temp = new StringTokenizer(snapshot.child(id+"").child("tempRange").getValue().toString(),"~");
                     StringTokenizer humi = new StringTokenizer(snapshot.child(id+"").child("humiRange").getValue().toString(),"~");
                     if (Double.parseDouble(String.valueOf(snapshot.child(id+"").child("temp").getValue()))>=Double.parseDouble(temp.nextToken())&&
