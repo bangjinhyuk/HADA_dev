@@ -49,7 +49,7 @@ import java.util.List;
 import java.util.StringTokenizer;
 
 public class DetailActivity extends AppCompatActivity {
-    private TextView detail_title, detail_date,detail_hum,detail_tem;
+    private TextView detail_title, detail_date,detail_hum,detail_tem,bluetooth;
     private LineChart lineChart;
     private ImageView detail_tempbt, detail_humibt, detail_alim, detail_battery_1, detail_battery_2, detail_modify_title, detail_back, detail_calender;
     private boolean detailbt = true;
@@ -64,6 +64,7 @@ public class DetailActivity extends AppCompatActivity {
     private List<Entry> entries;
     private ArrayList sortEntryList;
     private ValueEventListener valueEventListener;
+
 
 
 
@@ -83,6 +84,7 @@ public class DetailActivity extends AppCompatActivity {
         detail_date = findViewById(R.id.detail_date);
         detail_hum = findViewById(R.id.detail_hum);
         detail_tem = findViewById(R.id.detail_tem);
+        bluetooth = findViewById(R.id.bluetooth);
 
         lineChart = (LineChart)findViewById(R.id.chart);
 
@@ -189,7 +191,11 @@ public class DetailActivity extends AppCompatActivity {
                     graphService.drawGraph(entries, rgb);
                 }else graphService.drawGraph(new ArrayList<>(),Color.rgb(0, 0, 0));
 
-
+                if (snapshot.child(sensorID).child("connect").getValue().equals(0)){
+                    bluetooth.setVisibility(View.VISIBLE);
+                }else {
+                    bluetooth.setVisibility(View.INVISIBLE);
+                }
             }
 
             @Override
