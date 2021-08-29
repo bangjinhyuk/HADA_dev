@@ -95,7 +95,7 @@
         android:textStyle="bold"
         app:layout_constraintBottom_toBottomOf="@+id/detail_tem"
         app:layout_constraintEnd_toEndOf="@+id/imageView"
-        app:layout_constraintHorizontal_bias="0.84"
+        app:layout_constraintHorizontal_bias="0.77"
         app:layout_constraintStart_toStartOf="@+id/imageView"
         app:layout_constraintTop_toTopOf="@+id/detail_tem"
         app:layout_constraintVertical_bias="0.0" />

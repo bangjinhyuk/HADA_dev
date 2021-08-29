@@ -23,7 +23,7 @@ public class GraphService {
 
     public void drawGraph(List<Entry> entries, int color){
         LineDataSet lineDataSet = new LineDataSet(entries, "");
-        lineDataSet.setMode(LineDataSet.Mode.CUBIC_BEZIER);
+        lineDataSet.setMode(LineDataSet.Mode.HORIZONTAL_BEZIER);
 //        lineDataSet.setLineWidth(2);
 //        lineDataSet.setCircleRadius(6);
 //        lineDataSet.setCircleColor(Color.parseColor("#FFA1B4DC"));
