@@ -1,20 +1,26 @@
 package com.hada.fridgeapplication;
 
+import static android.content.Context.NOTIFICATION_SERVICE;
 import static android.content.Intent.FLAG_ACTIVITY_NEW_TASK;
 
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
 import android.content.Context;
 import android.content.Intent;
 import android.nfc.Tag;
+import android.os.Build;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.cardview.widget.CardView;
+import androidx.core.app.NotificationCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.firebase.FirebaseApp;
@@ -36,6 +42,8 @@ public class SensorAdapter extends RecyclerView.Adapter<SensorAdapter.ViewHolder
     private DatabaseReference mdatabase;
 
     private String TAG = "SensorAdapter click event";
+    NotificationManager manager; NotificationCompat.Builder builder;
+
 
     SensorAdapter(ArrayList<SensorModel> data, Context context) { // 생성자
         this.data = data;
@@ -90,8 +98,44 @@ public class SensorAdapter extends RecyclerView.Adapter<SensorAdapter.ViewHolder
                             Double.parseDouble(String.valueOf(snapshot.child(id+"").child("humi").getValue()))>=Double.parseDouble(humi.nextToken())&&
                             Double.parseDouble(String.valueOf(snapshot.child(id+"").child("humi").getValue()))<=Double.parseDouble(humi.nextToken())){
                         holder.sensor_color.setImageResource(R.drawable.green);
-                    }else holder.sensor_color.setImageResource(R.drawable.red);
-                }else holder.sensor_color.setImageResource(R.drawable.yellow);
+                        holder.color_state.setText("green");
+
+                    }else {
+                        if (holder.color_state.getText().toString().equals("green")){
+                            Toast.makeText(context,"green to red",Toast.LENGTH_LONG).show();
+                            holder.sensor_color.setImageResource(R.drawable.red);
+                            holder.color_state.setText("red");
+
+                            NotificationManager notificationManager = (NotificationManager) context.getSystemService(NOTIFICATION_SERVICE);
+
+                            String NOTIFICATION_ID = "10001";
+                            String NOTIFICATION_NAME = "동기화";
+                            int IMPORTANCE = NotificationManager.IMPORTANCE_HIGH;
+
+//채널 생성
+                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                                NotificationChannel channel = new NotificationChannel(NOTIFICATION_ID, NOTIFICATION_NAME, IMPORTANCE);
+                                notificationManager.createNotificationChannel(channel);
+                            }
+                            NotificationCompat.Builder builder = new NotificationCompat.Builder(context,NOTIFICATION_ID)
+                                    .setContentTitle(snapshot.child(id+"").child("sensorName").getValue().toString()) //타이틀 TEXT
+                                    .setContentText("확인 필요") //세부내용 TEXT
+                                    .setSmallIcon (R.drawable.getalarm) //필수 (안해주면 에러)
+                                    ;
+
+                            notificationManager.notify(0, builder.build());
+
+
+                        }else{
+                            holder.sensor_color.setImageResource(R.drawable.red);
+                            holder.color_state.setText("red");
+                        }
+                    }
+                }else {
+                    holder.sensor_color.setImageResource(R.drawable.yellow);
+                    holder.color_state.setText("yellow");
+
+                }
             }
 
             @Override
@@ -115,6 +159,7 @@ public class SensorAdapter extends RecyclerView.Adapter<SensorAdapter.ViewHolder
                }
            }
        });
+
     }
 
     // ViewHolder 클래스 정의를 통해 Adapter에서 사용할 뷰들을 연결
@@ -122,6 +167,7 @@ public class SensorAdapter extends RecyclerView.Adapter<SensorAdapter.ViewHolder
         TextView sensor_title;
         TextView temperature;
         TextView humidity;
+        TextView color_state;
         ImageView sensor_color;
         CardView cardView;
         ViewHolder(View itemView) {
@@ -131,6 +177,7 @@ public class SensorAdapter extends RecyclerView.Adapter<SensorAdapter.ViewHolder
             temperature = itemView.findViewById(R.id.temperature);
             humidity = itemView.findViewById(R.id.humidity);
             sensor_color = itemView.findViewById(R.id.img_color);
+            color_state = itemView.findViewById(R.id.color_state);
 
         }
     }

@@ -144,6 +144,9 @@ public class DetailActivity extends AppCompatActivity {
                 String day = (tmp = nowst.nextToken()).startsWith("0")? tmp.replaceFirst("0","") : tmp;
                 String set;
                 int rgb;
+                float hour;
+                float min;
+                float sec;
                 if (snapshot.child(sensorID).child("tempset").child(month+'-'+day+'-'+year).getValue()!=null&&
                         snapshot.child(sensorID).child("humiset").child(month+'-'+day+'-'+year).getValue()!=null) {
                     if (detailbt) {
@@ -164,9 +167,6 @@ public class DetailActivity extends AppCompatActivity {
                     sortEntryList = new ArrayList();
 
                     StringTokenizer setk = new StringTokenizer(set, ","); //데이터 하나씩 분류
-                    float hour;
-                    float min;
-                    float sec;
                     String apm;
                     int setkNum = setk.countTokens();
                     for (int i = 0; i < setkNum; i++) {
@@ -178,6 +178,7 @@ public class DetailActivity extends AppCompatActivity {
                         sec = Float.parseFloat(sectk.nextToken());
                         apm = sectk.nextToken();
                         if (apm.equals("PM")) hour += 12;
+                        if(apm.equals("AM")&& hour ==12) hour=0;
                         //Todo: 시분초로 0~24 사잇값으로 만들어 datatk.nextToken값과 함께 entry 저장
                         sortEntryList.add(new SortEntry(hour + (min / 60f) + (sec / 3600f), Float.parseFloat(datatk.nextToken())));
                     }
@@ -186,12 +187,9 @@ public class DetailActivity extends AppCompatActivity {
                         System.out.println(sortEntry);
                         entries.add(new Entry(((SortEntry) sortEntry).getTime(), ((SortEntry) sortEntry).getData()));
                     }
-
-
                     graphService.drawGraph(entries, rgb);
                 }else graphService.drawGraph(new ArrayList<>(),Color.rgb(0, 0, 0));
-
-                if (snapshot.child(sensorID).child("connect").getValue().equals(0)){
+                if ((snapshot.child(sensorID).child("connect").getValue()+"").equals("0")){
                     bluetooth.setVisibility(View.VISIBLE);
                 }else {
                     bluetooth.setVisibility(View.INVISIBLE);

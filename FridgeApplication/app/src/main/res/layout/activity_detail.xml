@@ -79,7 +79,7 @@
         android:textStyle="bold"
         app:layout_constraintBottom_toBottomOf="@+id/imageView"
         app:layout_constraintEnd_toEndOf="@+id/imageView"
-        app:layout_constraintHorizontal_bias="0.27"
+        app:layout_constraintHorizontal_bias="0.29"
         app:layout_constraintStart_toStartOf="@+id/imageView"
         app:layout_constraintTop_toTopOf="@+id/imageView"
         app:layout_constraintVertical_bias="0.39999998" />
@@ -95,7 +95,7 @@
         android:textStyle="bold"
         app:layout_constraintBottom_toBottomOf="@+id/detail_tem"
         app:layout_constraintEnd_toEndOf="@+id/imageView"
-        app:layout_constraintHorizontal_bias="0.77"
+        app:layout_constraintHorizontal_bias="0.79"
         app:layout_constraintStart_toStartOf="@+id/imageView"
         app:layout_constraintTop_toTopOf="@+id/detail_tem"
         app:layout_constraintVertical_bias="0.0" />
@@ -259,7 +259,6 @@
         android:text="블루투스 통신이 원활하지 않습니다."
         android:textColor="#B51414"
         android:textSize="10sp"
-        android:visibility="invisible"
         app:layout_constraintBottom_toTopOf="@+id/imageView"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
