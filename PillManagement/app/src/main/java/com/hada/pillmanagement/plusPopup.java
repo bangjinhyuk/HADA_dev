@@ -2,8 +2,8 @@ package com.hada.pillmanagement;
 
 import androidx.core.content.ContextCompat;
 
-import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
@@ -11,11 +11,12 @@ import android.view.View;
 import android.view.Window;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Toast;
 
 public class plusPopup extends Activity {
 
-    private Button monday,tuesday,wednesday,thursday,friday,saturday,sunday,ampm;
-    private EditText hour, min;
+    private Button monday,tuesday,wednesday,thursday,friday,saturday,sunday,ampm,set;
+    private EditText name, hour, min, week;
     private boolean [] click;
 
     @Override
@@ -33,8 +34,11 @@ public class plusPopup extends Activity {
         saturday = findViewById(R.id.saturday);
         sunday = findViewById(R.id.sunday);
         ampm = findViewById(R.id.ampm);
+        name = findViewById(R.id.name);
         hour = findViewById(R.id.hour);
         min = findViewById(R.id.min);
+        week = findViewById(R.id.week);
+        set = findViewById(R.id.plus_set);
 
         click = new boolean[8];
 
@@ -146,16 +150,41 @@ public class plusPopup extends Activity {
         ampm.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                System.out.println(click[7]);
                 if(click[7]){
-                    ampm.setText("오후");
+                    ampm.setText("오");
                     click[7] = false;
                 }else{
-                    ampm.setText("오전");
+                    ampm.setText("오후");
                     click[7] = true;
                 }
             }
         });
 
+        set.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(getApplicationContext(), CalendarActivity.class);
+                String day = "";
+                for(int i=0;i<7;i++){
+                    if(click[i]) day = day+i+"-";
+                }
+                if(hour.getText().toString().equals("")||min.getText().toString().equals("")||name.getText().toString().equals("")||week.getText().toString().equals("")){
+                    Toast.makeText(v.getContext(),"전부 올바르게 입력해주세요",Toast.LENGTH_SHORT);
+                    return;
+                }
+                int setHour = Integer.parseInt(hour.getText().toString());
+                int setMin = Integer.parseInt(min.getText().toString());
+                if(click[7]) setHour+=12;
+                intent.putExtra("name",name.getText().toString())
+                        .putExtra("day",day)
+                        .putExtra("setHour",setHour)
+                        .putExtra("setMin",setMin)
+                        .putExtra("week",week.getText().toString());
+                setResult(RESULT_OK, intent);
+                finish();
+            }
+        });
     }
     public void setTextColor(Button button, int i){
         if(i==0){

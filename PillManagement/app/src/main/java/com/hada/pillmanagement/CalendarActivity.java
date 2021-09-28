@@ -42,7 +42,13 @@ public class CalendarActivity extends AppCompatActivity {
                 new ActivityResultCallback<ActivityResult>() {
                     @Override
                     public void onActivityResult(ActivityResult result) {
-
+                        if(result.getResultCode() == RESULT_OK){
+                            System.out.println(result.getData().getStringExtra("name"));
+                            System.out.println(result.getData().getStringExtra("day"));
+                            System.out.println(result.getData().getIntExtra("setHour",0));
+                            System.out.println(result.getData().getIntExtra("setMin",0));
+                            System.out.println(result.getData().getStringExtra("week"));
+                        }
                     }
                 });
 
