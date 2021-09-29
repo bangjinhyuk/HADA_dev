@@ -13,6 +13,7 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 
@@ -31,6 +32,7 @@ public class CalendarActivity extends AppCompatActivity {
     private MaterialCalendarView calendarView;
     private ImageView plus, minus;
     private ActivityResultLauncher<Intent> plus_resultLauncher,minus_resultLauncher;
+    private CalendarDay clickedDay;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -68,7 +70,6 @@ public class CalendarActivity extends AppCompatActivity {
                     @Override
                     public void onActivityResult(ActivityResult result) {
                         setCalendar(db);
-
                     }
                 });
 
@@ -77,7 +78,6 @@ public class CalendarActivity extends AppCompatActivity {
                 new ActivityResultCallback<ActivityResult>() {
                     @Override
                     public void onActivityResult(ActivityResult result) {
-                        System.out.println("dk whrkxek.");
                         if(result.getResultCode() == RESULT_OK){
 
                             ContentValues values = new ContentValues();
@@ -98,18 +98,63 @@ public class CalendarActivity extends AppCompatActivity {
                         }
                     }
                 });
+
+        clickedDay = CalendarDay.today();
         setCalendar(db);
 
+
+
+        calendarView.setOnDateChangedListener(new OnDateSelectedListener() {
+            @Override
+            public void onDateSelected(@NonNull MaterialCalendarView widget, @NonNull CalendarDay date, boolean selected) {
+                Log.d("Calendar","날짜 변경 "+date.toString() );
+                clickedDay = date;
+                String today = date.getYear()+"."+(date.getMonth()+1)+"."+date.getDay(), getCompleteDatePill = "";
+                boolean findDate = false;
+                Cursor cDate = db.query("date",null,null,null,null,null,null,null);
+                while(cDate.moveToNext()){
+                    if(cDate.getString(cDate.getColumnIndex("date")).equals(today)) {
+                        findDate = true;
+                        getCompleteDatePill = cDate.getString(cDate.getColumnIndex("completepill"));
+                    }
+                }
+                Log.d("Calendar","DB date 존재 여부 "+findDate+" 먹은 약 Id "+ getCompleteDatePill);
+                if(!findDate) {
+                    ContentValues values = new ContentValues();
+                    values.put("date",today);
+                    values.put("completepill","");
+                    db.insert("date",null,values);
+                }
+            }
+        });
 
     }
 
     public void setCalendar(SQLiteDatabase db){
         //오늘 먹어야 할 약 계산
         Cursor c = db.query("mytable",null,null,null,null,null,null,null);
+        Cursor cDate = db.query("date",null,null,null,null,null,null,null);
         String startdate, enddate;
         CalendarDay startdateC, enddateC;
         int[] arrayOfColorDotsToDisplay = new int[5];
         int numColor=0;
+        String today = CalendarDay.today().getYear()+"."+(CalendarDay.today().getMonth()+1)+"."+CalendarDay.today().getDay(), getCompleteDatePill = "";
+        boolean findDate = false;
+        while(cDate.moveToNext()){
+            if(cDate.getString(cDate.getColumnIndex("date")).equals(today)) {
+                findDate = true;
+                getCompleteDatePill = cDate.getString(cDate.getColumnIndex("completepill"));
+            }
+        }
+        Log.d("Calendar","DB date 존재 여부 "+findDate+" 먹은 약 Id "+ getCompleteDatePill);
+
+        if(!findDate) {
+            ContentValues values = new ContentValues();
+            values.put("date",today);
+            values.put("completepill","");
+            db.insert("date",null,values);
+        }
+
         while(c.moveToNext()){
             startdate = c.getString(c.getColumnIndex("date"));
             enddate = c.getString(c.getColumnIndex("lastdate"));
@@ -129,17 +174,20 @@ public class CalendarActivity extends AppCompatActivity {
                 if(day>1) day -= 2;
                 else day =6;
                 if(c.getString(c.getColumnIndex("day")).contains(String.valueOf(day))) {
-                    arrayOfColorDotsToDisplay[numColor] = Color.rgb(255, 0, 0);
-                    numColor++;
+                    if(getCompleteDatePill.contains(c.getString(c.getColumnIndex("_id")))){
+                        arrayOfColorDotsToDisplay[numColor] = Color.rgb(0, 0, 255);
+                        numColor++;
+                    }else{
+                        arrayOfColorDotsToDisplay[numColor] = Color.rgb(255, 0, 0);
+                        numColor++;
+                    }
+
                 }
             }
         }
 
         Collection eventsToDisplayInTheCalendar= new ArrayList<>();
 
-//        int[] arrayOfColorDotsToDisplay={
-//                Color.rgb(255,0,0),Color.rgb(0,255,0),Color.rgb(0,0,255)
-//        };
 
         OneDayDecorator oneDayDecorator = new OneDayDecorator(eventsToDisplayInTheCalendar, Arrays.copyOfRange(arrayOfColorDotsToDisplay,0,numColor) );
 

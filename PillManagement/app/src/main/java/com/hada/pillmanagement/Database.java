@@ -21,13 +21,22 @@ public class Database extends SQLiteOpenHelper {
                 + "lastdate text);";
 
         db.execSQL(sql);
+        String sql1 = "CREATE TABLE if not exists date ("
+                + "_id integer primary key autoincrement,"
+                + "date text,"
+                + "completepill text);";
+
+        db.execSQL(sql1);
     }
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         String sql = "DROP TABLE if exists mytable";
-
         db.execSQL(sql);
+
+        String sql1 = "DROP TABLE if exists date";
+        db.execSQL(sql1);
+
         onCreate(db);
     }
 }
