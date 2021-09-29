@@ -23,7 +23,7 @@ public class CalendarActivity extends AppCompatActivity {
 
     private MaterialCalendarView calendarView;
     private ImageView plus, minus;
-    private ActivityResultLauncher<Intent> plus_resultLauncher;
+    private ActivityResultLauncher<Intent> plus_resultLauncher,minus_resultLauncher;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -39,6 +39,14 @@ public class CalendarActivity extends AppCompatActivity {
         plus = findViewById(R.id.bt_plus);
         minus = findViewById(R.id.bt_minus);
 
+        minus.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(v.getContext(),minusPopup.class);
+                minus_resultLauncher.launch(intent);
+            }
+        });
+
         plus.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -46,35 +54,43 @@ public class CalendarActivity extends AppCompatActivity {
                 plus_resultLauncher.launch(intent);
             }
         });
-        plus_resultLauncher = registerForActivityResult(
+
+        minus_resultLauncher = registerForActivityResult(
                 new ActivityResultContracts.StartActivityForResult(),
                 new ActivityResultCallback<ActivityResult>() {
                     @Override
                     public void onActivityResult(ActivityResult result) {
                         if(result.getResultCode() == RESULT_OK){
+                            Cursor c = db.query("mytable",null,null,null,null,null,null,null);
+                            while(c.moveToNext()){
+                                System.out.println("name : "+c.getString(c.getColumnIndex("name")));
+                            }
+
+                        }
+                    }
+                });
+
+        plus_resultLauncher = registerForActivityResult(
+                new ActivityResultContracts.StartActivityForResult(),
+                new ActivityResultCallback<ActivityResult>() {
+                    @Override
+                    public void onActivityResult(ActivityResult result) {
+                        System.out.println("dk whrkxek.");
+                        if(result.getResultCode() == RESULT_OK){
                             ContentValues values = new ContentValues();
                             values.put("name",result.getData().getStringExtra("name"));
                             values.put("day",result.getData().getStringExtra("day"));
+                            values.put("date",CalendarDay.today().toString());
                             values.put("setHour",result.getData().getIntExtra("setHour",0));
                             values.put("setMin",result.getData().getIntExtra("setMin",0));
                             values.put("week",result.getData().getStringExtra("week"));
 
                             db.insert("mytable",null,values);
 
-                            System.out.println("===============");
-
                             Cursor c = db.query("mytable",null,null,null,null,null,null,null);
                             while(c.moveToNext()){
                                 System.out.println("name : "+c.getString(c.getColumnIndex("name")));
                             }
-                            System.out.println("===============");
-
-                            System.out.println(result.getData().getStringExtra("name"));
-                            System.out.println(result.getData().getStringExtra("day"));
-                            System.out.println(result.getData().getIntExtra("setHour",0));
-                            System.out.println(result.getData().getIntExtra("setMin",0));
-                            System.out.println(result.getData().getStringExtra("week"));
-
 
                         }
                     }

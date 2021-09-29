@@ -7,11 +7,15 @@
         <entry key="app/src/main/res/drawable-v24/dat_layout.xml" value="0.4713541666666667" />
         <entry key="app/src/main/res/drawable-v24/day_clicked_layout.xml" value="0.4713541666666667" />
         <entry key="app/src/main/res/drawable-v24/day_layout.xml" value="0.28125" />
+        <entry key="app/src/main/res/drawable-v24/ic_launcher_foreground.xml" value="0.46822916666666664" />
         <entry key="app/src/main/res/drawable-v24/plus_set_layout.xml" value="0.28125" />
         <entry key="app/src/main/res/drawable/corner_layout.xml" value="0.28125" />
         <entry key="app/src/main/res/drawable/ic_launcher_background.xml" value="0.32447916666666665" />
         <entry key="app/src/main/res/layout/activity_calendar.xml" value="0.33" />
+        <entry key="app/src/main/res/layout/activity_minus_popup.xml" value="0.25" />
         <entry key="app/src/main/res/layout/activity_plus_popup.xml" value="0.42857142857142855" />
+        <entry key="app/src/main/res/layout/item.xml" value="0.38632246376811596" />
+        <entry key="app/src/main/res/layout/listview_item.xml" value="0.3016304347826087" />
       </map>
     </option>
   </component>

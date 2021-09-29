@@ -176,6 +176,7 @@ public class plusPopup extends Activity {
                 int setHour = Integer.parseInt(hour.getText().toString());
                 int setMin = Integer.parseInt(min.getText().toString());
                 if(click[7]) setHour+=12;
+
                 intent.putExtra("name",name.getText().toString())
                         .putExtra("day",day)
                         .putExtra("setHour",setHour)

@@ -15,6 +15,7 @@ public class Database extends SQLiteOpenHelper {
                 + "_id integer primary key autoincrement,"
                 + "name text,"
                 + "day text,"
+                + "date text,"
                 + "setHour integer,"
                 + "setMin integer,"
                 + "week text);";
