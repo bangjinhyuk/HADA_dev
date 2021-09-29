@@ -7,15 +7,25 @@ public class Item {
     private String name;
     private String date;
     private String day;
+    private String lastDate;
 
-    public Item(Long id, String name, String date, String day) {
+    public Item(Long id, String name, String date, String day, String lastDate) {
         this.id = id;
         this.name = name;
         this.date = date;
         this.day = day;
+        this.lastDate = lastDate;
     }
 
     public Item() {
+    }
+
+    public String getLastDate() {
+        return lastDate;
+    }
+
+    public void setLastDate(String lastDate) {
+        this.lastDate = lastDate;
     }
 
     public Long getId() {

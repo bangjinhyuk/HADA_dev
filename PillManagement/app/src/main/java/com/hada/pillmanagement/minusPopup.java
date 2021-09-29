@@ -13,14 +13,10 @@ import android.widget.ArrayAdapter;
 import android.widget.BaseAdapter;
 import android.widget.ListView;
 
-import java.util.ArrayList;
-import java.util.List;
 
 public class minusPopup extends Activity {
     private ListView listView;
     private PillListViewAdapter pillListViewAdapter;
-
-    List<Item> items= new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,7 +39,11 @@ public class minusPopup extends Activity {
         Cursor c = db.query("mytable",null,null,null,null,null,null,null);
         System.out.println(c.getCount()+"=>>>>>>>>>");
         while(c.moveToNext()){
-            pillListViewAdapter.addItem(c.getLong(c.getColumnIndex("_id")),c.getString(c.getColumnIndex("name")),c.getString(c.getColumnIndex("date")),c.getString(c.getColumnIndex("day")));
+            pillListViewAdapter.addItem(c.getLong(c.getColumnIndex("_id")),
+                    c.getString(c.getColumnIndex("name")),
+                    c.getString(c.getColumnIndex("day")),
+                    c.getString(c.getColumnIndex("date")),
+                    c.getString(c.getColumnIndex("lastdate")));
         }
         pillListViewAdapter.notifyDataSetChanged();
 

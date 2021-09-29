@@ -1,5 +1,6 @@
 package com.hada.pillmanagement;
 
+import android.annotation.SuppressLint;
 import android.app.LauncherActivity;
 import android.content.Context;
 import android.database.Cursor;
@@ -15,6 +16,7 @@ import android.widget.TextView;
 import com.prolificinteractive.materialcalendarview.CalendarDay;
 
 import java.util.ArrayList;
+import java.util.StringTokenizer;
 
 public class PillListViewAdapter extends BaseAdapter {
 
@@ -40,6 +42,7 @@ public class PillListViewAdapter extends BaseAdapter {
         return i;
     }
 
+    @SuppressLint("SetTextI18n")
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
 
@@ -57,10 +60,34 @@ public class PillListViewAdapter extends BaseAdapter {
 
         Item item = items.get(position);
 
+        StringTokenizer st = new StringTokenizer(item.getDay(),"-");
+        StringBuilder renameDay = new StringBuilder();
+        String tmp;
+        System.out.println(st.countTokens()+"kkkkkkk");
+        int index = st.countTokens();
+        for(int i=0;i<index;i++){
+            tmp = st.nextToken();
+            if(tmp.equals("0")){
+                renameDay.append("월");
+            }else if(tmp.equals("1")){
+                renameDay.append("화");
+            }else if(tmp.equals("2")){
+                renameDay.append("수");
+            }else if(tmp.equals("3")){
+                renameDay.append("목");
+            }else if(tmp.equals("4")){
+                renameDay.append("금");
+            }else if(tmp.equals("5")){
+                renameDay.append("토");
+            }else renameDay.append("일");
+
+            if(i!=index-1 && index!=1) renameDay.append("-");
+
+        }
         // 가져온 데이터를 텍스트뷰에 입력
         txt_name.setText(item.getName());
-        txt_date.setText(item.getdate());
-        txt_day.setText(item.getDay());
+        txt_date.setText(item.getdate()+"~"+item.getLastDate());
+        txt_day.setText(renameDay.toString());
 
         Database database;
         SQLiteDatabase db;
@@ -82,12 +109,13 @@ public class PillListViewAdapter extends BaseAdapter {
         return convertView;
     }
 
-    public void addItem(Long id, String name, String day, String date){
+    public void addItem(Long id, String name, String day, String date, String lastDate){
         Item item = new Item();
         item.setId(id);
         item.setName(name);
         item.setDate(date);
         item.setDay(day);
+        item.setLastDate(lastDate);
 
         items.add(item);
     }

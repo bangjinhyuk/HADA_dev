@@ -77,13 +77,14 @@ public class CalendarActivity extends AppCompatActivity {
                     public void onActivityResult(ActivityResult result) {
                         System.out.println("dk whrkxek.");
                         if(result.getResultCode() == RESULT_OK){
+
                             ContentValues values = new ContentValues();
                             values.put("name",result.getData().getStringExtra("name"));
                             values.put("day",result.getData().getStringExtra("day"));
-                            values.put("date",CalendarDay.today().toString());
+                            values.put("date",CalendarDay.today().getYear()+"."+(CalendarDay.today().getMonth()+1)+"."+CalendarDay.today().getDay());
                             values.put("setHour",result.getData().getIntExtra("setHour",0));
                             values.put("setMin",result.getData().getIntExtra("setMin",0));
-                            values.put("week",result.getData().getStringExtra("week"));
+                            values.put("lastdate",result.getData().getStringExtra("lastdate"));
 
                             db.insert("mytable",null,values);
 

@@ -1,8 +1,10 @@
 package com.hada.pillmanagement;
 
 import androidx.core.content.ContextCompat;
+import androidx.fragment.app.DialogFragment;
 
 import android.app.Activity;
+import android.app.DatePickerDialog;
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
@@ -10,13 +12,17 @@ import android.os.Bundle;
 import android.view.View;
 import android.view.Window;
 import android.widget.Button;
+import android.widget.DatePicker;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
+
+import java.util.Calendar;
 
 public class plusPopup extends Activity {
 
-    private Button monday,tuesday,wednesday,thursday,friday,saturday,sunday,ampm,set;
-    private EditText name, hour, min, week;
+    private Button monday,tuesday,wednesday,thursday,friday,saturday,sunday,ampm,set,lastdate;
+    private EditText name, hour, min;
     private boolean [] click;
 
     @Override
@@ -37,8 +43,8 @@ public class plusPopup extends Activity {
         name = findViewById(R.id.name);
         hour = findViewById(R.id.hour);
         min = findViewById(R.id.min);
-        week = findViewById(R.id.week);
         set = findViewById(R.id.plus_set);
+        lastdate = findViewById(R.id.lastdate);
 
         click = new boolean[8];
 
@@ -161,6 +167,15 @@ public class plusPopup extends Activity {
             }
         });
 
+        lastdate.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Calendar cal = Calendar.getInstance();
+                new DatePickerDialog(v.getContext(), mDateSetListener, cal.get(Calendar.YEAR), cal.get(Calendar.MONTH), cal.get(Calendar.DATE)).show();
+
+            }
+        });
+
         set.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -169,8 +184,8 @@ public class plusPopup extends Activity {
                 for(int i=0;i<7;i++){
                     if(click[i]) day = day+i+"-";
                 }
-                if(hour.getText().toString().equals("")||min.getText().toString().equals("")||name.getText().toString().equals("")||week.getText().toString().equals("")){
-                    Toast.makeText(v.getContext(),"전부 올바르게 입력해주세요",Toast.LENGTH_SHORT);
+                if(hour.getText().toString().equals("")||min.getText().toString().equals("")||name.getText().toString().equals("")||lastdate.getText().toString().equals("종료일 설정")){
+                    Toast.makeText(v.getContext(),"전부 올바르게 입력해주세요",Toast.LENGTH_SHORT).show();
                     return;
                 }
                 int setHour = Integer.parseInt(hour.getText().toString());
@@ -181,7 +196,7 @@ public class plusPopup extends Activity {
                         .putExtra("day",day)
                         .putExtra("setHour",setHour)
                         .putExtra("setMin",setMin)
-                        .putExtra("week",week.getText().toString());
+                        .putExtra("lastdate",lastdate.getText().toString());
                 setResult(RESULT_OK, intent);
                 finish();
             }
@@ -194,4 +209,14 @@ public class plusPopup extends Activity {
             button.setTextColor(Color.WHITE);
         }
     }
+    DatePickerDialog.OnDateSetListener mDateSetListener =
+            new DatePickerDialog.OnDateSetListener() {
+                @Override
+                public void onDateSet(DatePicker datePicker, int yy, int mm, int dd) {
+                    // Date Picker에서 선택한 날짜를 TextView에 설정
+                    Button lastdate = findViewById(R.id.lastdate);
+                    lastdate.setText(String.format("%d.%d.%d", yy,mm+1,dd));
+                }
+            };
+
 }

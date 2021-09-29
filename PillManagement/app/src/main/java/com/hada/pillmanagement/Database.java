@@ -18,7 +18,7 @@ public class Database extends SQLiteOpenHelper {
                 + "date text,"
                 + "setHour integer,"
                 + "setMin integer,"
-                + "week text);";
+                + "lastdate text);";
 
         db.execSQL(sql);
     }
