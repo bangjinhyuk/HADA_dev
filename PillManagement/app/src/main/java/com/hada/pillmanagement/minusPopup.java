@@ -1,6 +1,7 @@
 package com.hada.pillmanagement;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Color;
@@ -11,6 +12,7 @@ import android.view.ViewGroup;
 import android.view.Window;
 import android.widget.ArrayAdapter;
 import android.widget.BaseAdapter;
+import android.widget.ImageView;
 import android.widget.ListView;
 
 
@@ -47,8 +49,7 @@ public class minusPopup extends Activity {
         }
         pillListViewAdapter.notifyDataSetChanged();
 
-
-
     }
+
 
 }

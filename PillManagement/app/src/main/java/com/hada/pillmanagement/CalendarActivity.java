@@ -69,7 +69,7 @@ public class CalendarActivity extends AppCompatActivity {
                 new ActivityResultCallback<ActivityResult>() {
                     @Override
                     public void onActivityResult(ActivityResult result) {
-                        setCalendar(db);
+                        setCalendar(db,1);
                     }
                 });
 
@@ -94,13 +94,13 @@ public class CalendarActivity extends AppCompatActivity {
                             while(c.moveToNext()){
                                 System.out.println("name : "+c.getString(c.getColumnIndex("name")));
                             }
-                            setCalendar(db);
+                            setCalendar(db,1);
                         }
                     }
                 });
 
         clickedDay = CalendarDay.today();
-        setCalendar(db);
+        setCalendar(db,0);
 
 
 
@@ -130,7 +130,7 @@ public class CalendarActivity extends AppCompatActivity {
 
     }
 
-    public void setCalendar(SQLiteDatabase db){
+    public void setCalendar(SQLiteDatabase db,int type){
         //오늘 먹어야 할 약 계산
         Cursor c = db.query("mytable",null,null,null,null,null,null,null);
         Cursor cDate = db.query("date",null,null,null,null,null,null,null);
@@ -188,18 +188,16 @@ public class CalendarActivity extends AppCompatActivity {
 
         Collection eventsToDisplayInTheCalendar= new ArrayList<>();
 
+        if(type == 0){
+            OneDayDecorator oneDayDecorator = new OneDayDecorator(eventsToDisplayInTheCalendar, Arrays.copyOfRange(arrayOfColorDotsToDisplay,0,numColor) );
 
-        OneDayDecorator oneDayDecorator = new OneDayDecorator(eventsToDisplayInTheCalendar, Arrays.copyOfRange(arrayOfColorDotsToDisplay,0,numColor) );
+            calendarView.addDecorators(oneDayDecorator);
+            calendarView.setDateSelected(CalendarDay.today(),true);
+        }else{
+            OneDayPopupDecorator oneDayPopupDecorator = new OneDayPopupDecorator(eventsToDisplayInTheCalendar, Arrays.copyOfRange(arrayOfColorDotsToDisplay,0,numColor) );
 
-        calendarView.addDecorators(oneDayDecorator);
+            calendarView.addDecorators(oneDayPopupDecorator);
+        }
 
-        calendarView.setDateSelected(CalendarDay.today(),true);
-
-        calendarView.setOnDateChangedListener(new OnDateSelectedListener() {
-            @Override
-            public void onDateSelected(@NonNull MaterialCalendarView widget, @NonNull CalendarDay date, boolean selected) {
-                widget.addDecorators();
-            }
-        });
     }
 }
