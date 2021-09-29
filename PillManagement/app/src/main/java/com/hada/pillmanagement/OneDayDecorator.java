@@ -12,15 +12,24 @@ import com.prolificinteractive.materialcalendarview.DayViewDecorator;
 import com.prolificinteractive.materialcalendarview.DayViewFacade;
 import com.prolificinteractive.materialcalendarview.spans.DotSpan;
 
+import java.util.Collection;
 import java.util.Date;
+import java.util.HashSet;
 
 public class OneDayDecorator implements DayViewDecorator {
     private CalendarDay date;
+    private final int[] colors;
+    private final HashSet<CalendarDay> dates;
 
 
-    public OneDayDecorator(){
+    public OneDayDecorator(Collection<CalendarDay> dates, int[] colors){
         date = CalendarDay.today();
+        this.dates = new HashSet<>(dates);
+
+        this.colors = colors;
     }
+
+
     @Override
     public boolean shouldDecorate(CalendarDay day) {
         return day.equals(date);
@@ -29,10 +38,9 @@ public class OneDayDecorator implements DayViewDecorator {
     @Override
     public void decorate(DayViewFacade view) {
         view.addSpan(new StyleSpan(Typeface.BOLD));
-        view.addSpan(new RelativeSizeSpan(1.2f));
-        view.addSpan(new DotSpan(9,Color.BLUE));
-        view.addSpan(new DotSpan(9,Color.RED));
-        view.addSpan(new DotSpan(9,Color.YELLOW));
+        view.addSpan((new CustmMultipleDotSpan(8, colors)));
+        view.addSpan(new RelativeSizeSpan(1.4f));
+
     }
 
     public void setDate(Date date){

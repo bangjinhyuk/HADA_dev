@@ -63,7 +63,6 @@ public class PillListViewAdapter extends BaseAdapter {
         StringTokenizer st = new StringTokenizer(item.getDay(),"-");
         StringBuilder renameDay = new StringBuilder();
         String tmp;
-        System.out.println(st.countTokens()+"kkkkkkk");
         int index = st.countTokens();
         for(int i=0;i<index;i++){
             tmp = st.nextToken();

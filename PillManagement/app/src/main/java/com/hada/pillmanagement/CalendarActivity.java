@@ -11,6 +11,7 @@ import android.content.ContentValues;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.ImageView;
@@ -18,6 +19,12 @@ import android.widget.ImageView;
 import com.prolificinteractive.materialcalendarview.CalendarDay;
 import com.prolificinteractive.materialcalendarview.MaterialCalendarView;
 import com.prolificinteractive.materialcalendarview.OnDateSelectedListener;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Calendar;
+import java.util.Collection;
+import java.util.StringTokenizer;
 
 public class CalendarActivity extends AppCompatActivity {
 
@@ -60,13 +67,8 @@ public class CalendarActivity extends AppCompatActivity {
                 new ActivityResultCallback<ActivityResult>() {
                     @Override
                     public void onActivityResult(ActivityResult result) {
-                        if(result.getResultCode() == RESULT_OK){
-                            Cursor c = db.query("mytable",null,null,null,null,null,null,null);
-                            while(c.moveToNext()){
-                                System.out.println("name : "+c.getString(c.getColumnIndex("name")));
-                            }
+                        setCalendar(db);
 
-                        }
                     }
                 });
 
@@ -92,14 +94,54 @@ public class CalendarActivity extends AppCompatActivity {
                             while(c.moveToNext()){
                                 System.out.println("name : "+c.getString(c.getColumnIndex("name")));
                             }
-
+                            setCalendar(db);
                         }
                     }
                 });
+        setCalendar(db);
 
 
+    }
 
-        OneDayDecorator oneDayDecorator = new OneDayDecorator();
+    public void setCalendar(SQLiteDatabase db){
+        //오늘 먹어야 할 약 계산
+        Cursor c = db.query("mytable",null,null,null,null,null,null,null);
+        String startdate, enddate;
+        CalendarDay startdateC, enddateC;
+        int[] arrayOfColorDotsToDisplay = new int[5];
+        int numColor=0;
+        while(c.moveToNext()){
+            startdate = c.getString(c.getColumnIndex("date"));
+            enddate = c.getString(c.getColumnIndex("lastdate"));
+            StringTokenizer startdateToken = new StringTokenizer(startdate,".");
+            StringTokenizer enddateToken = new StringTokenizer(enddate,".");
+            startdateC = CalendarDay.from(Integer.parseInt(startdateToken.nextToken()),
+                    Integer.parseInt(startdateToken.nextToken())-1,
+                    Integer.parseInt(startdateToken.nextToken()));
+
+            enddateC = CalendarDay.from(Integer.parseInt(enddateToken.nextToken()),
+                    Integer.parseInt(enddateToken.nextToken())-1,
+                    Integer.parseInt(enddateToken.nextToken()));
+
+
+            if(CalendarDay.today().isInRange(startdateC,enddateC)){
+                int day = CalendarDay.today().getCalendar().get(Calendar.DAY_OF_WEEK);
+                if(day>1) day -= 2;
+                else day =6;
+                if(c.getString(c.getColumnIndex("day")).contains(String.valueOf(day))) {
+                    arrayOfColorDotsToDisplay[numColor] = Color.rgb(255, 0, 0);
+                    numColor++;
+                }
+            }
+        }
+
+        Collection eventsToDisplayInTheCalendar= new ArrayList<>();
+
+//        int[] arrayOfColorDotsToDisplay={
+//                Color.rgb(255,0,0),Color.rgb(0,255,0),Color.rgb(0,0,255)
+//        };
+
+        OneDayDecorator oneDayDecorator = new OneDayDecorator(eventsToDisplayInTheCalendar, Arrays.copyOfRange(arrayOfColorDotsToDisplay,0,numColor) );
 
         calendarView.addDecorators(oneDayDecorator);
 
