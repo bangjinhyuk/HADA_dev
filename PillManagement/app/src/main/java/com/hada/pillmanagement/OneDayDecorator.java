@@ -19,7 +19,7 @@ import java.util.HashSet;
 public class OneDayDecorator implements DayViewDecorator {
     private CalendarDay date;
     private final int[] colors;
-    private final HashSet<CalendarDay> dates;
+    private HashSet<CalendarDay> dates;
 
 
     public OneDayDecorator(Collection<CalendarDay> dates, int[] colors){
@@ -28,7 +28,9 @@ public class OneDayDecorator implements DayViewDecorator {
 
         this.colors = colors;
     }
-
+    public void removeHashSet() {
+        this.dates = new HashSet<>();
+    }
 
     @Override
     public boolean shouldDecorate(CalendarDay day) {

@@ -16,6 +16,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.ListView;
 
 import com.prolificinteractive.materialcalendarview.CalendarDay;
 import com.prolificinteractive.materialcalendarview.MaterialCalendarView;
@@ -33,6 +34,9 @@ public class CalendarActivity extends AppCompatActivity {
     private ImageView plus, minus;
     private ActivityResultLauncher<Intent> plus_resultLauncher,minus_resultLauncher;
     private CalendarDay clickedDay;
+    private ListView calendar_listview;
+    private PillCalendarListViewAdapter pillCalendarListViewAdapter;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -47,6 +51,7 @@ public class CalendarActivity extends AppCompatActivity {
         calendarView = findViewById(R.id.calendar_view);
         plus = findViewById(R.id.bt_plus);
         minus = findViewById(R.id.bt_minus);
+        calendar_listview = findViewById(R.id.calendar_listview);
 
         minus.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -69,7 +74,7 @@ public class CalendarActivity extends AppCompatActivity {
                 new ActivityResultCallback<ActivityResult>() {
                     @Override
                     public void onActivityResult(ActivityResult result) {
-                        setCalendar(db,1);
+                        setCalendar(db,1,clickedDay);
                     }
                 });
 
@@ -94,13 +99,13 @@ public class CalendarActivity extends AppCompatActivity {
                             while(c.moveToNext()){
                                 System.out.println("name : "+c.getString(c.getColumnIndex("name")));
                             }
-                            setCalendar(db,1);
+                            setCalendar(db,1,clickedDay);
                         }
                     }
                 });
 
         clickedDay = CalendarDay.today();
-        setCalendar(db,0);
+        setCalendar(db,0,clickedDay);
 
 
 
@@ -111,6 +116,7 @@ public class CalendarActivity extends AppCompatActivity {
                 clickedDay = date;
                 String today = date.getYear()+"."+(date.getMonth()+1)+"."+date.getDay(), getCompleteDatePill = "";
                 boolean findDate = false;
+                Cursor c = db.query("mytable",null,null,null,null,null,null,null);
                 Cursor cDate = db.query("date",null,null,null,null,null,null,null);
                 while(cDate.moveToNext()){
                     if(cDate.getString(cDate.getColumnIndex("date")).equals(today)) {
@@ -125,12 +131,12 @@ public class CalendarActivity extends AppCompatActivity {
                     values.put("completepill","");
                     db.insert("date",null,values);
                 }
+                setCalendar(db,1,clickedDay);
             }
         });
-
     }
 
-    public void setCalendar(SQLiteDatabase db,int type){
+    public void setCalendar(SQLiteDatabase db,int type,CalendarDay calendarDay){
         //오늘 먹어야 할 약 계산
         Cursor c = db.query("mytable",null,null,null,null,null,null,null);
         Cursor cDate = db.query("date",null,null,null,null,null,null,null);
@@ -154,7 +160,10 @@ public class CalendarActivity extends AppCompatActivity {
             values.put("completepill","");
             db.insert("date",null,values);
         }
-
+        pillCalendarListViewAdapter = new PillCalendarListViewAdapter(CalendarActivity.this);
+        calendar_listview.setAdapter(pillCalendarListViewAdapter);
+        calendar_listview.setClickable(false);
+        pillCalendarListViewAdapter.clear();
         while(c.moveToNext()){
             startdate = c.getString(c.getColumnIndex("date"));
             enddate = c.getString(c.getColumnIndex("lastdate"));
@@ -184,10 +193,42 @@ public class CalendarActivity extends AppCompatActivity {
 
                 }
             }
+
+            //리스트뷰
+            if(calendarDay.isInRange(startdateC,enddateC)){
+                int day = calendarDay.getCalendar().get(Calendar.DAY_OF_WEEK);
+                if(day>1) day -= 2;
+                else day =6;
+                if(c.getString(c.getColumnIndex("day")).contains(String.valueOf(day))) {
+                    if(getCompleteDatePill.contains(c.getString(c.getColumnIndex("_id")))){
+                        pillCalendarListViewAdapter.addItem(c.getLong(c.getColumnIndex("_id")),
+                                c.getString(c.getColumnIndex("name")),
+                                c.getString(c.getColumnIndex("day")),
+                                c.getString(c.getColumnIndex("date")),
+                                c.getInt(c.getColumnIndex("setHour")),
+                                c.getInt(c.getColumnIndex("setMin")),
+                                c.getString(c.getColumnIndex("lastdate")),
+                                true);
+                    }else{
+                        pillCalendarListViewAdapter.addItem(c.getLong(c.getColumnIndex("_id")),
+                                c.getString(c.getColumnIndex("name")),
+                                c.getString(c.getColumnIndex("day")),
+                                c.getString(c.getColumnIndex("date")),
+                                c.getInt(c.getColumnIndex("setHour")),
+                                c.getInt(c.getColumnIndex("setMin")),
+                                c.getString(c.getColumnIndex("lastdate")),
+                                false);
+                    }
+
+                }
+            }
+            pillCalendarListViewAdapter.notifyDataSetChanged();
+
         }
 
         Collection eventsToDisplayInTheCalendar= new ArrayList<>();
-
+        calendarView.removeDecorators();
+        calendarView.invalidateDecorators();
         if(type == 0){
             OneDayDecorator oneDayDecorator = new OneDayDecorator(eventsToDisplayInTheCalendar, Arrays.copyOfRange(arrayOfColorDotsToDisplay,0,numColor) );
 
