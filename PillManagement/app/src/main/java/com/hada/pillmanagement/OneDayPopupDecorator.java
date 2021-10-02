@@ -37,6 +37,7 @@ public class OneDayPopupDecorator implements DayViewDecorator {
     public void decorate(DayViewFacade view) {
         view.addSpan(new StyleSpan(Typeface.BOLD));
         view.addSpan((new CustmMultipleDotSpan(8, colors)));
+        view.addSpan(new RelativeSizeSpan(1.4f));
 
     }
 

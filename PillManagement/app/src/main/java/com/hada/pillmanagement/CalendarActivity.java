@@ -6,22 +6,30 @@ import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.NotificationCompat;
 
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
 import android.content.ContentValues;
+import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Color;
+import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
 import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import com.prolificinteractive.materialcalendarview.CalendarDay;
 import com.prolificinteractive.materialcalendarview.MaterialCalendarView;
 import com.prolificinteractive.materialcalendarview.OnDateSelectedListener;
 
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
@@ -36,6 +44,7 @@ public class CalendarActivity extends AppCompatActivity {
     private CalendarDay clickedDay;
     private ListView calendar_listview;
     private PillCalendarListViewAdapter pillCalendarListViewAdapter;
+    Handler mHandler = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -134,6 +143,28 @@ public class CalendarActivity extends AppCompatActivity {
                 setCalendar(db,1,clickedDay);
             }
         });
+        mHandler = new Handler();
+        Thread t = new Thread(new Runnable(){
+            @Override public void run() {
+                // UI 작업 수행 X
+                while (true) {
+                    try {
+                        mHandler.post(new Runnable() {
+                            @Override
+                            public void run() {
+                                setCalendar(db, 1, clickedDay);
+                            }
+                        });
+                        Thread.sleep(1000*10);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        });
+        t.start();
+
+
     }
 
     public void setCalendar(SQLiteDatabase db,int type,CalendarDay calendarDay){
@@ -193,7 +224,9 @@ public class CalendarActivity extends AppCompatActivity {
 
                 }
             }
+            NotificationCompat.Builder builder = new NotificationCompat.Builder(this, "default");
 
+            builder.setSmallIcon(R.drawable.pills);
             //리스트뷰
             if(calendarDay.isInRange(startdateC,enddateC)){
                 int day = calendarDay.getCalendar().get(Calendar.DAY_OF_WEEK);
@@ -218,6 +251,17 @@ public class CalendarActivity extends AppCompatActivity {
                                 c.getInt(c.getColumnIndex("setMin")),
                                 c.getString(c.getColumnIndex("lastdate")),
                                 false);
+
+                    }
+                    if(LocalTime.now().getHour() == c.getInt(c.getColumnIndex("setHour"))&&
+                            LocalTime.now().getMinute() == c.getInt(c.getColumnIndex("setMin"))){
+                        builder.setContentTitle("약 섭취 시간입니다.");
+                        builder.setContentText(c.getString(c.getColumnIndex("name")));
+                        NotificationManager notificationManager = (NotificationManager) this.getSystemService(Context.NOTIFICATION_SERVICE);
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                            notificationManager.createNotificationChannel(new NotificationChannel("default", "기본 채널", NotificationManager.IMPORTANCE_DEFAULT));
+                        }
+                        notificationManager.notify(Integer.parseInt(c.getString(c.getColumnIndex("_id"))), builder.build());
                     }
 
                 }
@@ -225,7 +269,7 @@ public class CalendarActivity extends AppCompatActivity {
             pillCalendarListViewAdapter.notifyDataSetChanged();
 
         }
-
+        Toast.makeText(this.getApplicationContext(),"getText중",Toast.LENGTH_SHORT).show();
         Collection eventsToDisplayInTheCalendar= new ArrayList<>();
         calendarView.removeDecorators();
         calendarView.invalidateDecorators();
