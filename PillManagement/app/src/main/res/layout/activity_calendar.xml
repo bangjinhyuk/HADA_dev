@@ -14,45 +14,20 @@
         android:src="@drawable/bell"
         app:layout_constraintBottom_toTopOf="@+id/calendar_view"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.25"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-
-    <ImageView
-        android:id="@+id/imageView4"
-        android:layout_width="25dp"
-        android:layout_height="25dp"
-        android:src="@drawable/bluetooth"
-        app:layout_constraintBottom_toTopOf="@+id/calendar_view"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.75"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
-    <TextView
-        android:id="@+id/text2"
-        android:layout_width="30dp"
-        android:layout_height="30dp"
-        android:layout_marginStart="24dp"
-        android:layout_marginEnd="8dp"
-        android:padding="7dp"
-        app:layout_constraintBottom_toTopOf="@+id/calendar_view"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toEndOf="@+id/imageView4"
-        app:layout_constraintTop_toTopOf="parent" />
 
     <ImageView
         android:id="@+id/bt_minus"
         android:layout_width="30dp"
         android:layout_height="30dp"
-        android:layout_marginEnd="24dp"
+        android:layout_marginStart="24dp"
         android:padding="7dp"
         android:src="@drawable/minus"
         app:layout_constraintBottom_toTopOf="@+id/calendar_view"
         app:layout_constraintEnd_toStartOf="@+id/imageView2"
-        app:layout_constraintHorizontal_bias="1.0"
+        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
@@ -60,13 +35,12 @@
         android:id="@+id/bt_plus"
         android:layout_width="30dp"
         android:layout_height="30dp"
-        android:layout_marginStart="24dp"
-        android:layout_marginEnd="8dp"
+        android:layout_marginEnd="24dp"
         android:padding="7dp"
         android:src="@drawable/plus"
         app:layout_constraintBottom_toTopOf="@+id/calendar_view"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintHorizontal_bias="1.0"
         app:layout_constraintStart_toEndOf="@+id/imageView2"
         app:layout_constraintTop_toTopOf="parent" />
 

@@ -9,6 +9,15 @@ public class CalendarItem {
     private int min;
     private String lastDate;
     private boolean complete;
+    private int caseNum;
+
+    public int getCaseNum() {
+        return caseNum;
+    }
+
+    public void setCaseNum(int caseNum) {
+        this.caseNum = caseNum;
+    }
 
     public boolean isComplete() {
         return complete;

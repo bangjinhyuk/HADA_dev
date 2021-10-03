@@ -22,7 +22,7 @@ import java.util.Calendar;
 public class plusPopup extends Activity {
 
     private Button monday,tuesday,wednesday,thursday,friday,saturday,sunday,ampm,set,lastdate;
-    private EditText name, hour, min;
+    private EditText name, hour, min, case_num;
     private boolean [] click;
 
     @Override
@@ -45,6 +45,7 @@ public class plusPopup extends Activity {
         min = findViewById(R.id.min);
         set = findViewById(R.id.plus_set);
         lastdate = findViewById(R.id.lastdate);
+        case_num = findViewById(R.id.case_num);
 
         click = new boolean[8];
 
@@ -158,7 +159,7 @@ public class plusPopup extends Activity {
             public void onClick(View v) {
                 System.out.println(click[7]);
                 if(click[7]){
-                    ampm.setText("오");
+                    ampm.setText("오전");
                     click[7] = false;
                 }else{
                     ampm.setText("오후");
@@ -184,7 +185,11 @@ public class plusPopup extends Activity {
                 for(int i=0;i<7;i++){
                     if(click[i]) day = day+i+"-";
                 }
-                if(hour.getText().toString().equals("")||min.getText().toString().equals("")||name.getText().toString().equals("")||lastdate.getText().toString().equals("종료일 설정")){
+                if(hour.getText().toString().equals("")||
+                        min.getText().toString().equals("")||
+                        name.getText().toString().equals("")||
+                        lastdate.getText().toString().equals("종료일 설정")||
+                        case_num.getText().toString().equals("")){
                     Toast.makeText(v.getContext(),"전부 올바르게 입력해주세요",Toast.LENGTH_SHORT).show();
                     return;
                 }
@@ -196,7 +201,8 @@ public class plusPopup extends Activity {
                         .putExtra("day",day)
                         .putExtra("setHour",setHour)
                         .putExtra("setMin",setMin)
-                        .putExtra("lastdate",lastdate.getText().toString());
+                        .putExtra("lastdate",lastdate.getText().toString())
+                        .putExtra("caseNum",case_num.getText().toString());
                 setResult(RESULT_OK, intent);
                 finish();
             }

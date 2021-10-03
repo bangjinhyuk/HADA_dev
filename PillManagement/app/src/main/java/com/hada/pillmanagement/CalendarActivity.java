@@ -27,7 +27,9 @@ import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Looper;
 import android.os.Message;
+import android.os.Vibrator;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -45,13 +47,18 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
+import java.text.Format;
+import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collection;
+import java.util.Date;
 import java.util.List;
 import java.util.Set;
+import java.util.SimpleTimeZone;
 import java.util.StringTokenizer;
 import java.util.UUID;
 
@@ -63,7 +70,6 @@ public class CalendarActivity extends AppCompatActivity {
     private CalendarDay clickedDay;
     private ListView calendar_listview;
     private PillCalendarListViewAdapter pillCalendarListViewAdapter;
-    private TextView text2;
     Handler mHandler = null;
     ConnectedThread connectedThread = null;
     Handler btHandler;
@@ -93,13 +99,13 @@ public class CalendarActivity extends AppCompatActivity {
     private EditText editTextSend; // 송신 할 데이터를 작성하기 위한 에딧 텍스트
 
     private Button buttonSend; // 송신하기 위한 버튼
-
+    Database database;
+    SQLiteDatabase db;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_calendar);
-        text2 = findViewById(R.id.text2);
 
         // 블루투스 활성화하기
 
@@ -123,9 +129,6 @@ public class CalendarActivity extends AppCompatActivity {
         }
 
 
-
-        Database database;
-        SQLiteDatabase db;
         database = new Database(CalendarActivity.this, "pill.db", null, 1);
         db = database.getWritableDatabase();
         database.onCreate(db);
@@ -166,7 +169,6 @@ public class CalendarActivity extends AppCompatActivity {
                     @Override
                     public void onActivityResult(ActivityResult result) {
                         if(result.getResultCode() == RESULT_OK){
-
                             ContentValues values = new ContentValues();
                             values.put("name",result.getData().getStringExtra("name"));
                             values.put("day",result.getData().getStringExtra("day"));
@@ -174,6 +176,7 @@ public class CalendarActivity extends AppCompatActivity {
                             values.put("setHour",result.getData().getIntExtra("setHour",0));
                             values.put("setMin",result.getData().getIntExtra("setMin",0));
                             values.put("lastdate",result.getData().getStringExtra("lastdate"));
+                            values.put("caseNum",result.getData().getStringExtra("caseNum"));
 
                             db.insert("mytable",null,values);
 
@@ -185,7 +188,6 @@ public class CalendarActivity extends AppCompatActivity {
                         }
                     }
                 });
-
         clickedDay = CalendarDay.today();
         setCalendar(db,0,clickedDay);
 
@@ -225,7 +227,7 @@ public class CalendarActivity extends AppCompatActivity {
                         mHandler.post(new Runnable() {
                             @Override
                             public void run() {
-                                setCalendar(db, 1, clickedDay);
+                                setCalendar(db,1, clickedDay);
                             }
                         });
                         Thread.sleep(1000*10);
@@ -257,20 +259,17 @@ public class CalendarActivity extends AppCompatActivity {
         }
     }
     public void connectDevice(String deviceName) {
-        Toast.makeText(getApplicationContext(),"BluetoothDevice 0",Toast.LENGTH_SHORT).show();
 
         // 페어링 된 디바이스들을 모두 탐색
         for(BluetoothDevice tempDevice : devices) {
             // 사용자가 선택한 이름과 같은 디바이스로 설정하고 반복문 종료
             if(deviceName.equals(tempDevice.getName())) {
-                Toast.makeText(getApplicationContext(),"BluetoothDevice 1",Toast.LENGTH_SHORT).show();
                 bluetoothDevice = tempDevice;
                 break;
             }
         }
         // UUID 생성
         UUID uuid = java.util.UUID.fromString("00001101-0000-1000-8000-00805f9b34fb");
-        Toast.makeText(getApplicationContext(),"bluetoothSocket0",Toast.LENGTH_SHORT).show();
 
         // Rfcomm 채널을 통해 블루투스 디바이스와 통신하는 소켓 생성
         try {
@@ -279,12 +278,9 @@ public class CalendarActivity extends AppCompatActivity {
             // 데이터 송,수신 스트림을 얻어옵니다.
             outputStream = bluetoothSocket.getOutputStream();
             inputStream = bluetoothSocket.getInputStream();
-            Toast.makeText(getApplicationContext(),"bluetoothSocket1",Toast.LENGTH_SHORT).show();
             // 데이터 수신 함수 호출 1
             connectedThread = new ConnectedThread(bluetoothSocket);
             connectedThread.start();
-            // 데이터 수신 함수 호출 2
-            receiveData();
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -314,7 +310,7 @@ public class CalendarActivity extends AppCompatActivity {
         public void run() {
             byte[] buffer = new byte[1024];
             int bytes;
-            final Handler handler = new Handler();
+            Handler mHandler = new Handler(Looper.getMainLooper());
             while (true) {
                 try {
                     bytes = mmInStream.available();
@@ -322,17 +318,18 @@ public class CalendarActivity extends AppCompatActivity {
                         buffer = new byte[1024];
                         bytes = mmInStream.available();
                         bytes = mmInStream.read(buffer, 0, bytes);
-                        Toast.makeText(getApplicationContext(),"진짜 받아오간함2",Toast.LENGTH_SHORT).show();
-                        Toast.makeText(getApplicationContext(),bytes+"만큼 받아옴22",Toast.LENGTH_SHORT).show();
                         final String readMessage = new String((byte[]) buffer, "UTF-8");
-                        Toast.makeText(getApplicationContext(),"받아와서 포스트 하기 직전임",Toast.LENGTH_SHORT).show();
-
-                        handler.post(new Runnable() {
+                        mHandler.post(new Runnable() {
                             @Override
                             public void run() {
-                                Toast.makeText(getApplicationContext(),readMessage,Toast.LENGTH_SHORT).show();
                                 // 텍스트 뷰에 출력
-                                text2.setText(readMessage + "\n");
+                                StringTokenizer st = new StringTokenizer(readMessage,",");
+                                int caseNum = Integer.parseInt(st.nextToken());
+                                String open = st.nextToken();
+                                Log.d("dkdkdkdkddk",readMessage);
+                                Log.d("dkdkdkdkddk",caseNum+"");
+                                Log.d("dkdkdkdkddk",String.valueOf(open.charAt(0)));
+                                if(Integer.parseInt(String.valueOf(open.charAt(0))) == 1) setCalendar(db,caseNum+2,clickedDay);
                             }
                         });
                     }
@@ -359,78 +356,6 @@ public class CalendarActivity extends AppCompatActivity {
         }
     }
 
-    public void receiveData() {
-
-        final Handler handler = new Handler();
-
-        // 데이터를 수신하기 위한 버퍼를 생성
-
-        readBufferPosition = 0;
-
-        readBuffer = new byte[1024];
-        Toast.makeText(getApplicationContext(),"스레드 생성 직전 ",Toast.LENGTH_SHORT).show();
-        // 데이터를 수신하기 위한 쓰레드 생성
-
-        workerThread = new Thread(new Runnable() {
-
-            @Override
-            public void run() {
-
-                while(!Thread.currentThread().isInterrupted()) {
-                    try {
-                        // 데이터를 수신했는지 확인합니다.
-                        int byteAvailable = inputStream.available();
-                        // 데이터가 수신 된 경우
-                        if(byteAvailable > 0) {
-                            Toast.makeText(getApplicationContext(),"진짜 받아오간함",Toast.LENGTH_SHORT).show();
-                            Toast.makeText(getApplicationContext(),byteAvailable+"만큼 받아옴",Toast.LENGTH_SHORT).show();
-
-                            // 입력 스트림에서 바이트 단위로 읽어 옵니다.
-                            byte[] bytes = new byte[byteAvailable];
-                            inputStream.read(bytes);
-                            // 입력 스트림 바이트를 한 바이트씩 읽어 옵니다.
-                            for(int i = 0; i < byteAvailable; i++) {
-                                byte tempByte = bytes[i];
-                                // 개행문자를 기준으로 받음(한줄)
-                                if(tempByte == '\n') {
-                                    // readBuffer 배열을 encodedBytes로 복사
-                                    byte[] encodedBytes = new byte[readBufferPosition];
-                                    System.arraycopy(readBuffer, 0, encodedBytes, 0, encodedBytes.length);
-                                    // 인코딩 된 바이트 배열을 문자열로 변환
-                                    final String text = new String(encodedBytes, "US-ASCII");
-                                    readBufferPosition = 0;
-                                    Toast.makeText(getApplicationContext(),"받아와서 포스트 하기 직전임",Toast.LENGTH_SHORT).show();
-
-                                    handler.post(new Runnable() {
-                                        @Override
-                                        public void run() {
-                                            Toast.makeText(getApplicationContext(),text,Toast.LENGTH_SHORT).show();
-                                            // 텍스트 뷰에 출력
-                                            text2.setText(text + "\n");
-                                        }
-                                    });
-                                } // 개행 문자가 아닐 경우
-                                else {
-                                    readBuffer[readBufferPosition++] = tempByte;
-                                }
-                            }
-                        }
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                    try {
-                        // 1초마다 받아옴
-                        Thread.sleep(1000);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-                }
-            }
-        });
-        workerThread.start();
-    }
-
-
     public void selectBluetoothDevice() {
 
         // 이미 페어링 되어있는 블루투스 기기를 찾습니다.
@@ -446,7 +371,6 @@ public class CalendarActivity extends AppCompatActivity {
         else {
 
             // 디바이스를 선택하기 위한 다이얼로그 생성
-            Toast.makeText(getApplicationContext(),"AlertDialog 0",Toast.LENGTH_SHORT).show();
 
             AlertDialog.Builder builder = new AlertDialog.Builder(this);
 
@@ -475,7 +399,6 @@ public class CalendarActivity extends AppCompatActivity {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
                     // 해당 디바이스와 연결하는 함수 호출
-                    Toast.makeText(getApplicationContext(),"AlertDialog onClick",Toast.LENGTH_SHORT).show();
                     connectDevice(charSequences[which].toString());
                 }
             });
@@ -487,7 +410,7 @@ public class CalendarActivity extends AppCompatActivity {
         }
     }
 
-    public void setCalendar(SQLiteDatabase db,int type,CalendarDay calendarDay){
+    public void setCalendar(SQLiteDatabase db ,int type,CalendarDay calendarDay){
         //오늘 먹어야 할 약 계산
         Cursor c = db.query("mytable",null,null,null,null,null,null,null);
         Cursor cDate = db.query("date",null,null,null,null,null,null,null);
@@ -534,7 +457,8 @@ public class CalendarActivity extends AppCompatActivity {
                 if(day>1) day -= 2;
                 else day =6;
                 if(c.getString(c.getColumnIndex("day")).contains(String.valueOf(day))) {
-                    if(getCompleteDatePill.contains(c.getString(c.getColumnIndex("_id")))){
+                    if(getCompleteDatePill.contains(c.getString(c.getColumnIndex("_id"))+"-")){
+                        Log.d("Calendar","DB date 존재 여부 complete1"+c.getString(c.getColumnIndex("_id")));
                         arrayOfColorDotsToDisplay[numColor] = Color.rgb(0, 0, 255);
                         numColor++;
                     }else{
@@ -544,8 +468,80 @@ public class CalendarActivity extends AppCompatActivity {
 
                 }
             }
-            NotificationCompat.Builder builder = new NotificationCompat.Builder(this, "default");
 
+            StringBuilder sb1 = new StringBuilder();
+            StringBuilder sb2 = new StringBuilder();
+            boolean minus = false;
+            String renameMin, renameHour, renameday, renameMonth;
+            if(c.getInt(c.getColumnIndex("setMin"))<10&&c.getInt(c.getColumnIndex("setMin"))>1 ) renameMin = "0"+(c.getInt(c.getColumnIndex("setMin"))-1);
+            else if(c.getInt(c.getColumnIndex("setMin"))>10) renameMin = String.valueOf(c.getInt(c.getColumnIndex("setMin"))-1);
+            else {
+                renameMin = "59";
+                minus = true;
+            }
+            if(c.getInt(c.getColumnIndex("setHour"))<10) {
+                if(minus) renameHour = "0" + (c.getInt(c.getColumnIndex("setHour"))-1);
+                else renameHour = "0" + c.getInt(c.getColumnIndex("setHour"));
+            }else {
+                if(minus) renameHour = String.valueOf(c.getInt(c.getColumnIndex("setHour"))-1);
+                else renameHour = String.valueOf(c.getInt(c.getColumnIndex("setHour")));
+            }
+            renameMonth = (CalendarDay.today().getMonth()+1<10)?"0"+(CalendarDay.today().getMonth()+1):String.valueOf(CalendarDay.today().getMonth()+1);
+            renameday = (CalendarDay.today().getDay()<10)?"0"+(CalendarDay.today().getDay()):String.valueOf(CalendarDay.today().getDay());
+
+            sb1.append(CalendarDay.today().getYear())
+                    .append("-")
+                    .append(renameMonth)
+                    .append("-")
+                    .append(renameday)
+                    .append("T")
+                    .append(renameHour)
+                    .append(":")
+                    .append(renameMin)
+                    .append(":00.000");
+            renameHour = (LocalTime.now().getHour()<10)?"0"+(LocalTime.now().getHour()):String.valueOf(LocalTime.now().getHour());
+            renameMin = (LocalTime.now().getMinute()<10)?"0"+(LocalTime.now().getMinute()):String.valueOf(LocalTime.now().getMinute());
+
+            sb2.append(CalendarDay.today().getYear())
+                    .append("-")
+                    .append(renameMonth)
+                    .append("-")
+                    .append(renameday)
+                    .append("T")
+                    .append(renameHour)
+                    .append(":")
+                    .append(renameMin)
+                    .append(":00.000");
+
+
+            LocalDateTime date1 = LocalDateTime.parse(sb1);
+            LocalDateTime date2 = LocalDateTime.parse(sb2);
+            Log.d("업데이트",1111111+ String.valueOf(date1.isBefore(date2)));
+            Log.d("업데이트",2222222+ String.valueOf(date2.isBefore(date1.plusMinutes(30))));
+            Log.d("업데이트",333333+ String.valueOf(type-2 ==c.getInt(c.getColumnIndex("caseNum"))));
+            Log.d("업데이트",333333+ date1.toString());
+            Log.d("업데이트",333333+ date1.plusMinutes(30).toString());
+            Log.d("업데이트",333333+ date2.toString());
+
+            if(date1.isBefore(date2) && date2.isBefore(date1.plusMinutes(30)) && type-2 ==c.getInt(c.getColumnIndex("caseNum"))){
+
+                Log.d("업데이트",c.getString(c.getColumnIndex("_id")));
+
+                String sql = "UPDATE date SET completepill='"+(getCompleteDatePill+"-"+c.getString(c.getColumnIndex("_id"))+"-")+"' WHERE date ='"+today+"';";
+                db.execSQL(sql);
+//                ContentValues values = new ContentValues();
+//                values.put("date",today);
+//                values.put("completepill",getCompleteDatePill+"-"+c.getString(c.getColumnIndex("_id"))+"-");
+//                db.insert("date",null,values);
+            }
+
+            while(cDate.moveToNext()){
+                if(cDate.getString(cDate.getColumnIndex("date")).equals(today)) {
+                    findDate = true;
+                    getCompleteDatePill = cDate.getString(cDate.getColumnIndex("completepill"));
+                }
+            }
+            NotificationCompat.Builder builder = new NotificationCompat.Builder(this, "default");
             builder.setSmallIcon(R.drawable.pills);
             //리스트뷰
             if(calendarDay.isInRange(startdateC,enddateC)){
@@ -553,7 +549,12 @@ public class CalendarActivity extends AppCompatActivity {
                 if(day>1) day -= 2;
                 else day =6;
                 if(c.getString(c.getColumnIndex("day")).contains(String.valueOf(day))) {
-                    if(getCompleteDatePill.contains(c.getString(c.getColumnIndex("_id")))){
+                    Log.d("Calendar","DB date 존재 여부 complete2-1 "+c.getString(c.getColumnIndex("day")));
+                    Log.d("Calendar","DB date 존재 여부 complete2-1 "+day);
+                    Log.d("Calendar","DB date 존재 여부 complete2-2 "+c.getString(c.getColumnIndex("_id")));
+                    Log.d("Calendar","DB date 존재 여부 complete2-2 "+getCompleteDatePill);
+                    if(getCompleteDatePill.contains(c.getString(c.getColumnIndex("_id"))+"-")){
+
                         pillCalendarListViewAdapter.addItem(c.getLong(c.getColumnIndex("_id")),
                                 c.getString(c.getColumnIndex("name")),
                                 c.getString(c.getColumnIndex("day")),
@@ -561,7 +562,9 @@ public class CalendarActivity extends AppCompatActivity {
                                 c.getInt(c.getColumnIndex("setHour")),
                                 c.getInt(c.getColumnIndex("setMin")),
                                 c.getString(c.getColumnIndex("lastdate")),
-                                true);
+                                true,
+                                c.getInt(c.getColumnIndex("caseNum"))
+                        );
                     }else{
                         pillCalendarListViewAdapter.addItem(c.getLong(c.getColumnIndex("_id")),
                                 c.getString(c.getColumnIndex("name")),
@@ -570,11 +573,16 @@ public class CalendarActivity extends AppCompatActivity {
                                 c.getInt(c.getColumnIndex("setHour")),
                                 c.getInt(c.getColumnIndex("setMin")),
                                 c.getString(c.getColumnIndex("lastdate")),
-                                false);
+                                false,
+                                c.getInt(c.getColumnIndex("caseNum"))
+                        );
 
                     }
                     if(LocalTime.now().getHour() == c.getInt(c.getColumnIndex("setHour"))&&
                             LocalTime.now().getMinute() == c.getInt(c.getColumnIndex("setMin"))){
+                        Vibrator vibrator = (Vibrator)getSystemService(VIBRATOR_SERVICE);
+                        vibrator.vibrate(500); // 0.5초간 진동
+
                         builder.setContentTitle("약 섭취 시간입니다.");
                         builder.setContentText(c.getString(c.getColumnIndex("name")));
                         NotificationManager notificationManager = (NotificationManager) this.getSystemService(Context.NOTIFICATION_SERVICE);
@@ -589,7 +597,6 @@ public class CalendarActivity extends AppCompatActivity {
             pillCalendarListViewAdapter.notifyDataSetChanged();
 
         }
-//        Toast.makeText(this.getApplicationContext(),"getText중",Toast.LENGTH_SHORT).show();
         Collection eventsToDisplayInTheCalendar= new ArrayList<>();
         calendarView.removeDecorators();
         calendarView.invalidateDecorators();
@@ -598,7 +605,7 @@ public class CalendarActivity extends AppCompatActivity {
 
             calendarView.addDecorators(oneDayDecorator);
             calendarView.setDateSelected(CalendarDay.today(),true);
-        }else{
+        }else if(type ==1){
             OneDayPopupDecorator oneDayPopupDecorator = new OneDayPopupDecorator(eventsToDisplayInTheCalendar, Arrays.copyOfRange(arrayOfColorDotsToDisplay,0,numColor) );
 
             calendarView.addDecorators(oneDayPopupDecorator);

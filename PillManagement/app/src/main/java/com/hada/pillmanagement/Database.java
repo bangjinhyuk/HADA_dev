@@ -18,7 +18,8 @@ public class Database extends SQLiteOpenHelper {
                 + "date text,"
                 + "setHour integer,"
                 + "setMin integer,"
-                + "lastdate text);";
+                + "lastdate text,"
+                + "caseNum integer);";
 
         db.execSQL(sql);
         String sql1 = "CREATE TABLE if not exists date ("

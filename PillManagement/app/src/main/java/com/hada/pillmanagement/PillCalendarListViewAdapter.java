@@ -3,6 +3,7 @@ package com.hada.pillmanagement;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -56,6 +57,7 @@ public class PillCalendarListViewAdapter extends BaseAdapter {
         TextView txt_date = (TextView)convertView.findViewById(R.id.pill_cal_date);
         TextView txt_day = (TextView)convertView.findViewById(R.id.pill_cal_day);
         TextView txt_time = (TextView)convertView.findViewById(R.id.pill_cal_time);
+        TextView case_num = (TextView)convertView.findViewById(R.id.tv_caseNum);
         ImageView image_complete = (ImageView)convertView.findViewById(R.id.btn_cal_complete);
 
         CalendarItem item = items.get(position);
@@ -102,19 +104,18 @@ public class PillCalendarListViewAdapter extends BaseAdapter {
         txt_date.setText(item.getDate()+"~"+item.getLastDate());
         txt_day.setText(renameDay.toString());
         txt_time.setText(renameTime.toString());
+        case_num.setText(String.valueOf(": "+ item.getCaseNum())+"번 약통");
 
-        if(item.isComplete()) image_complete.setImageResource(R.drawable.checkmark);
+        Log.d("item",String.valueOf(item.isComplete()));
+        if(item.isComplete()) {
+            image_complete.setImageResource(R.drawable.checkmark);
+        }
 
-        Database database;
-        SQLiteDatabase db;
-        database = new Database(convertView.getContext(), "pill.db", null, 1);
-        db = database.getWritableDatabase();
-        database.onCreate(db);
 
         return convertView;
     }
 
-    public void addItem(Long id, String name, String day, String date,int sethour, int setmin, String lastDate, boolean complete){
+    public void addItem(Long id, String name, String day, String date,int sethour, int setmin, String lastDate, boolean complete,int caseNum){
         CalendarItem calendarItem = new CalendarItem();
         calendarItem.setId(id);
         calendarItem.setName(name);
@@ -124,6 +125,7 @@ public class PillCalendarListViewAdapter extends BaseAdapter {
         calendarItem.setHour(sethour);
         calendarItem.setMin(setmin);
         calendarItem.setComplete(complete);
+        calendarItem.setCaseNum(caseNum);
 
         items.add(calendarItem);
     }

@@ -21,6 +21,21 @@
         app:layout_constraintVertical_bias="0.13" />
 
     <TextView
+        android:id="@+id/tv_caseNum"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:text="약통"
+        android:textColor="@color/black"
+        android:textSize="15dp"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toBottomOf="@+id/pill_cal_name"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toEndOf="@+id/pill_cal_name"
+        app:layout_constraintTop_toTopOf="@+id/pill_cal_name" />
+
+    <TextView
         android:id="@+id/pill_cal_date"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
