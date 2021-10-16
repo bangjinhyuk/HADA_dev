@@ -72,7 +72,6 @@ public class CalendarActivity extends AppCompatActivity {
     private PillCalendarListViewAdapter pillCalendarListViewAdapter;
     Handler mHandler = null;
     ConnectedThread connectedThread = null;
-    Handler btHandler;
 
     private static final int REQUEST_ENABLE_BT = 10; // 블루투스 활성화 상태
 
@@ -516,16 +515,8 @@ public class CalendarActivity extends AppCompatActivity {
 
             LocalDateTime date1 = LocalDateTime.parse(sb1);
             LocalDateTime date2 = LocalDateTime.parse(sb2);
-            Log.d("업데이트",1111111+ String.valueOf(date1.isBefore(date2)));
-            Log.d("업데이트",2222222+ String.valueOf(date2.isBefore(date1.plusMinutes(30))));
-            Log.d("업데이트",333333+ String.valueOf(type-2 ==c.getInt(c.getColumnIndex("caseNum"))));
-            Log.d("업데이트",333333+ date1.toString());
-            Log.d("업데이트",333333+ date1.plusMinutes(30).toString());
-            Log.d("업데이트",333333+ date2.toString());
-
             if(date1.isBefore(date2) && date2.isBefore(date1.plusMinutes(30)) && type-2 ==c.getInt(c.getColumnIndex("caseNum"))){
 
-                Log.d("업데이트",c.getString(c.getColumnIndex("_id")));
 
                 String sql = "UPDATE date SET completepill='"+(getCompleteDatePill+"-"+c.getString(c.getColumnIndex("_id"))+"-")+"' WHERE date ='"+today+"';";
                 db.execSQL(sql);
@@ -549,10 +540,6 @@ public class CalendarActivity extends AppCompatActivity {
                 if(day>1) day -= 2;
                 else day =6;
                 if(c.getString(c.getColumnIndex("day")).contains(String.valueOf(day))) {
-                    Log.d("Calendar","DB date 존재 여부 complete2-1 "+c.getString(c.getColumnIndex("day")));
-                    Log.d("Calendar","DB date 존재 여부 complete2-1 "+day);
-                    Log.d("Calendar","DB date 존재 여부 complete2-2 "+c.getString(c.getColumnIndex("_id")));
-                    Log.d("Calendar","DB date 존재 여부 complete2-2 "+getCompleteDatePill);
                     if(getCompleteDatePill.contains(c.getString(c.getColumnIndex("_id"))+"-")){
 
                         pillCalendarListViewAdapter.addItem(c.getLong(c.getColumnIndex("_id")),
