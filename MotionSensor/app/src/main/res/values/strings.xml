@@ -1,0 +1,4 @@
+<resources>
+    <string name="app_name">myApp</string>
+    <string name="no_account">계정이 없나요? <b>회원가입</b>하기</string> <!--회원가입 글씨 Bold-->
+</resources>
