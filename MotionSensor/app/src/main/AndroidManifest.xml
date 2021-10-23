@@ -12,6 +12,9 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.AppCompat.NoActionBar">
         <activity
+            android:name=".TimeSetting"
+            android:exported="true" />
+        <activity
             android:name=".MainList"
             android:exported="true" />
         <activity
@@ -28,9 +31,6 @@
             android:exported="true" />
         <activity
             android:name=".ShowGraph"
-            android:exported="true" />
-        <activity
-            android:name=".TimeSetting"
             android:exported="true" />
         <activity
             android:name=".MainActivity"
