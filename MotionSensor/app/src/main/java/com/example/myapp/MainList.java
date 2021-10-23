@@ -32,6 +32,20 @@ public class MainList extends AppCompatActivity {
                 startActivity(intent);
             }
         });
+        showGraphB.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(getApplicationContext(),ShowGraph.class);
+                startActivity(intent);
+            }
+        });
+        contactB.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(getApplicationContext(),ContactInformation.class);
+                startActivity(intent);
+            }
+        });
 
 
 

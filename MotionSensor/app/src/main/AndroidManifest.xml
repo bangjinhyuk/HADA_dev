@@ -12,6 +12,12 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.AppCompat.NoActionBar">
         <activity
+            android:name=".ContactInformation"
+            android:exported="true" />
+        <activity
+            android:name=".ShowGraph"
+            android:exported="true" />
+        <activity
             android:name=".TimeSetting"
             android:exported="true" />
         <activity
@@ -25,12 +31,6 @@
             android:exported="true" />
         <activity
             android:name=".ProfileActivity"
-            android:exported="true" />
-        <activity
-            android:name=".ContactInformation"
-            android:exported="true" />
-        <activity
-            android:name=".ShowGraph"
             android:exported="true" />
         <activity
             android:name=".MainActivity"

@@ -54,9 +54,9 @@ public class TimeSetting extends AppCompatActivity {
             public void onClick(View view) {
                 if(alarmType!=1){
                     alarmType =1;
-                    BforAlarm.setBackgroundColor(Color.rgb(94,69,138));
+                    BforAlarm.setBackgroundColor(Color.rgb(112,92,147));
                     BforAlarm.setTextColor(Color.WHITE);
-                    BforCall.setBackgroundColor(Color.WHITE);
+                    BforCall.setBackgroundResource(R.drawable.time_setting_button);
                     BforCall.setTextColor(Color.BLACK);
 
                 }
@@ -68,9 +68,9 @@ public class TimeSetting extends AppCompatActivity {
             public void onClick(View view) {
                 if(alarmType!=2){
                     alarmType =2;
-                    BforCall.setBackgroundColor(Color.rgb(94,69,138));
+                    BforCall.setBackgroundColor(Color.rgb(112,92,147));
                     BforCall.setTextColor(Color.WHITE);
-                    BforAlarm.setBackgroundColor(Color.WHITE);
+                    BforAlarm.setBackgroundResource(R.drawable.time_setting_button);
                     BforAlarm.setTextColor(Color.BLACK);
 
                 }
