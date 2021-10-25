@@ -102,6 +102,49 @@ public class MainList extends AppCompatActivity {
         db = database.getWritableDatabase();
         database.onCreate(db);
 
+//        ContentValues values = new ContentValues();
+//        values.put("date","2021-10-25");
+//        values.put("hour","2");
+//        values.put("detections","3");
+//        db.insert("mytable",null,values);
+//        values = new ContentValues();
+//        values.put("date","2021-10-25");
+//        values.put("hour","3");
+//        values.put("detections","14");
+//        db.insert("mytable",null,values);
+//        values = new ContentValues();
+//        values.put("date","2021-10-25");
+//        values.put("hour","4");
+//        values.put("detections","8");
+//        db.insert("mytable",null,values);
+//        values = new ContentValues();
+//        values.put("date","2021-10-25");
+//        values.put("hour","5");
+//        values.put("detections","5");
+//        db.insert("mytable",null,values);
+//
+//        values = new ContentValues();
+//        values.put("date","2021-10-24");
+//        values.put("hour","10");
+//        values.put("detections","3");
+//        db.insert("mytable",null,values);
+//        values = new ContentValues();
+//        values.put("date","2021-10-24");
+//        values.put("hour","11");
+//        values.put("detections","14");
+//        db.insert("mytable",null,values);
+//        values = new ContentValues();
+//        values.put("date","2021-10-24");
+//        values.put("hour","12");
+//        values.put("detections","8");
+//        db.insert("mytable",null,values);
+//        values = new ContentValues();
+//        values.put("date","2021-10-24");
+//        values.put("hour","13");
+//        values.put("detections","5");
+//        db.insert("mytable",null,values);
+
+
         tv_time = findViewById(R.id.tv_time);
         timesettingB = findViewById(R.id.timesettingB);
         showGraphB = findViewById(R.id.showGraphB);

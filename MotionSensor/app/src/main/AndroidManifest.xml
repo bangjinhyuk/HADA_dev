@@ -16,6 +16,9 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.AppCompat.NoActionBar">
         <activity
+            android:name=".CalendarPopup"
+            android:theme="@android:style/Theme.Dialog" />
+        <activity
             android:name=".ContactInformation"
             android:exported="true" />
         <activity

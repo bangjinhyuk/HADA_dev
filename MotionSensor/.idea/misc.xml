@@ -5,14 +5,19 @@
       <map>
         <entry key="app/src/main/res/drawable/main_button.xml" value="0.21041666666666667" />
         <entry key="app/src/main/res/drawable/main_button2.xml" value="0.21041666666666667" />
+        <entry key="app/src/main/res/drawable/switch_thumb.xml" value="0.378125" />
+        <entry key="app/src/main/res/drawable/switch_track_off.xml" value="0.378125" />
+        <entry key="app/src/main/res/drawable/switch_track_on.xml" value="0.378125" />
+        <entry key="app/src/main/res/drawable/switch_track_selector.xml" value="0.378125" />
         <entry key="app/src/main/res/drawable/time_setting_button.xml" value="0.21041666666666667" />
         <entry key="app/src/main/res/drawable/time_setting_button2.xml" value="0.21041666666666667" />
+        <entry key="app/src/main/res/layout/activity_calendar_popup.xml" value="0.3619791666666667" />
         <entry key="app/src/main/res/layout/activity_contact_information.xml" value="0.25" />
         <entry key="app/src/main/res/layout/activity_login.xml" value="0.19427083333333334" />
         <entry key="app/src/main/res/layout/activity_main.xml" value="0.19427083333333334" />
         <entry key="app/src/main/res/layout/activity_main_list.xml" value="0.13072916666666667" />
         <entry key="app/src/main/res/layout/activity_profile.xml" value="0.213768115942029" />
-        <entry key="app/src/main/res/layout/activity_show_graph.xml" value="0.213768115942029" />
+        <entry key="app/src/main/res/layout/activity_show_graph.xml" value="0.25" />
         <entry key="app/src/main/res/layout/activity_time_setting.xml" value="0.25" />
       </map>
     </option>
