@@ -1,14 +1,20 @@
 package com.example.myapp;
 
 import androidx.annotation.Nullable;
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
+import android.content.ContentValues;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -22,6 +28,8 @@ import android.widget.TextView;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -61,6 +69,10 @@ public class MainList extends AppCompatActivity {
     private EditText editTextSend; // 송신 할 데이터를 작성하기 위한 에딧 텍스트
 
     private Button buttonSend; // 송신하기 위한 버튼
+
+    Database database;
+    SQLiteDatabase db;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -86,7 +98,9 @@ public class MainList extends AppCompatActivity {
             }
         }
 
-
+        database = new Database(MainList.this, "myapp.db", null, 1);
+        db = database.getWritableDatabase();
+        database.onCreate(db);
 
         tv_time = findViewById(R.id.tv_time);
         timesettingB = findViewById(R.id.timesettingB);
@@ -196,15 +210,35 @@ public class MainList extends AppCompatActivity {
                         bytes = mmInStream.read(buffer, 0, bytes);
                         final String readMessage = new String((byte[]) buffer, "UTF-8");
                         mHandler.post(new Runnable() {
+                            @SuppressLint("Range")
+                            @RequiresApi(api = Build.VERSION_CODES.O)
                             @Override
                             public void run() {
-                                // 텍스트 뷰에 출력
-                                StringTokenizer st = new StringTokenizer(readMessage,",");
-                                int caseNum = Integer.parseInt(st.nextToken());
-                                String open = st.nextToken();
-                                Log.d("dkdkdkdkddk",readMessage);
-                                Log.d("dkdkdkdkddk",caseNum+"");
-                                Log.d("dkdkdkdkddk",String.valueOf(open.charAt(0)));
+                                int detection = Integer.parseInt(readMessage);
+                                if(detection == 1) {
+                                    boolean write = false;
+                                    ContentValues values = new ContentValues();
+                                    LocalDate now = LocalDate.now();
+                                    LocalTime nowT = LocalTime.now();
+
+                                    values.put("date",now.toString());
+                                    values.put("hour",nowT.getHour());
+
+                                    Cursor c = db.query("mytable",null,null,null,null,null,null,null);
+                                    while(c.moveToNext()){
+                                        if(c.getString(c.getColumnIndex("date")).equals(now.toString())&& c.getInt(c.getColumnIndex("hour")) == nowT.getHour()){
+                                            values.put("detections",c.getInt(c.getColumnIndex("detections"))+1);
+                                            int id = c.getInt(c.getColumnIndex("_id"));
+                                            db.update("mytable",values,"_id="+id,null);
+                                            write =true;
+                                        }
+                                    }
+                                    if (!write){
+                                        values.put("detections",1);
+                                        db.insert("mytable",null,values);
+                                    }
+                                }
+
                             }
                         });
                     }
