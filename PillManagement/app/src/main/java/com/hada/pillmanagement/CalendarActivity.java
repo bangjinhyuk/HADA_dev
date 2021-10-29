@@ -564,21 +564,42 @@ public class CalendarActivity extends AppCompatActivity {
                                 c.getInt(c.getColumnIndex("caseNum"))
                         );
 
-                    }
-                    if(LocalTime.now().getHour() == c.getInt(c.getColumnIndex("setHour"))&&
-                            LocalTime.now().getMinute() == c.getInt(c.getColumnIndex("setMin"))){
-                        Vibrator vibrator = (Vibrator)getSystemService(VIBRATOR_SERVICE);
-                        vibrator.vibrate(500); // 0.5초간 진동
+                        if(LocalTime.now().getHour() == c.getInt(c.getColumnIndex("setHour"))){
 
-                        builder.setContentTitle("약 섭취 시간입니다.");
-                        builder.setContentText(c.getString(c.getColumnIndex("name")));
-                        NotificationManager notificationManager = (NotificationManager) this.getSystemService(Context.NOTIFICATION_SERVICE);
-                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                            notificationManager.createNotificationChannel(new NotificationChannel("default", "기본 채널", NotificationManager.IMPORTANCE_DEFAULT));
+                            int setMin = c.getInt(c.getColumnIndex("setMin")), maxMin=0;
+                            if(setMin<58)  maxMin=setMin+2;
+                            else if(setMin==58) maxMin=0;
+                            else if(setMin==59) maxMin=1;
+                            if(setMin<58){
+                                if(setMin<=LocalTime.now().getMinute() && maxMin>=LocalTime.now().getMinute()){
+                                    Vibrator vibrator = (Vibrator)getSystemService(VIBRATOR_SERVICE);
+                                    vibrator.vibrate(500); // 0.5초간 진동
+
+                                    builder.setContentTitle("약 섭취 시간입니다.");
+                                    builder.setContentText(c.getString(c.getColumnIndex("name")));
+                                    NotificationManager notificationManager = (NotificationManager) this.getSystemService(Context.NOTIFICATION_SERVICE);
+                                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                                        notificationManager.createNotificationChannel(new NotificationChannel("default", "기본 채널", NotificationManager.IMPORTANCE_DEFAULT));
+                                    }
+                                    notificationManager.notify(Integer.parseInt(c.getString(c.getColumnIndex("_id"))), builder.build());
+                                }
+                            }else{
+                                if(setMin<=LocalTime.now().getMinute() || maxMin>=LocalTime.now().getMinute()){
+                                    Vibrator vibrator = (Vibrator)getSystemService(VIBRATOR_SERVICE);
+                                    vibrator.vibrate(500); // 0.5초간 진동
+
+                                    builder.setContentTitle("약 섭취 시간입니다.");
+                                    builder.setContentText(c.getString(c.getColumnIndex("name")));
+                                    NotificationManager notificationManager = (NotificationManager) this.getSystemService(Context.NOTIFICATION_SERVICE);
+                                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                                        notificationManager.createNotificationChannel(new NotificationChannel("default", "기본 채널", NotificationManager.IMPORTANCE_DEFAULT));
+                                    }
+                                    notificationManager.notify(Integer.parseInt(c.getString(c.getColumnIndex("_id"))), builder.build());
+                                }
+                            }
                         }
-                        notificationManager.notify(Integer.parseInt(c.getString(c.getColumnIndex("_id"))), builder.build());
-                    }
 
+                    }
                 }
             }
             pillCalendarListViewAdapter.notifyDataSetChanged();

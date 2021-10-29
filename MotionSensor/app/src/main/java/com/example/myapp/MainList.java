@@ -12,6 +12,7 @@ import android.bluetooth.BluetoothSocket;
 import android.content.ContentValues;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Build;
@@ -24,12 +25,14 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Switch;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -151,6 +154,9 @@ public class MainList extends AppCompatActivity {
         contactB = findViewById(R.id.contactB);
         switch1 = findViewById(R.id.switch1);
 
+        SharedPreferences sharedPreferences = getSharedPreferences("last",MODE_PRIVATE);
+        tv_time.setText(sharedPreferences.getString("date",""));
+
         timesettingB.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -253,12 +259,13 @@ public class MainList extends AppCompatActivity {
                         bytes = mmInStream.read(buffer, 0, bytes);
                         final String readMessage = new String((byte[]) buffer, "UTF-8");
                         mHandler.post(new Runnable() {
-                            @SuppressLint("Range")
+                            @SuppressLint({"Range", "SetTextI18n"})
                             @RequiresApi(api = Build.VERSION_CODES.O)
                             @Override
                             public void run() {
                                 int detection = Integer.parseInt(readMessage);
                                 if(detection == 1) {
+                                    Toast.makeText(getApplicationContext(),"움직임 감지",Toast.LENGTH_LONG).show();
                                     boolean write = false;
                                     ContentValues values = new ContentValues();
                                     LocalDate now = LocalDate.now();
@@ -266,6 +273,18 @@ public class MainList extends AppCompatActivity {
 
                                     values.put("date",now.toString());
                                     values.put("hour",nowT.getHour());
+                                    SharedPreferences sharedPreferences = getSharedPreferences("last",MODE_PRIVATE);
+                                    SharedPreferences.Editor editor = sharedPreferences.edit();
+                                    if(nowT.getHour()>12) {
+                                        tv_time.setText(LocalDate.now() + " 오후 " + (nowT.getHour() - 12) + "시 " + nowT.getMinute() + "분");
+                                        editor.putString("date",LocalDate.now() + " 오후 " + (nowT.getHour() - 12) + "시 " + nowT.getMinute() + "분");
+                                        editor.apply();
+                                    }
+                                    else {
+                                        tv_time.setText(LocalDate.now() + " 오전 " + nowT.getHour() + "시 " + nowT.getMinute() + "분");
+                                        editor.putString("date",LocalDate.now() + " 오전 " + nowT.getHour() + "시 " + nowT.getMinute() + "분");
+                                        editor.apply();
+                                    }
 
                                     Cursor c = db.query("mytable",null,null,null,null,null,null,null);
                                     while(c.moveToNext()){
