@@ -3,22 +3,28 @@ package com.example.myapp;
 import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.NotificationCompat;
 
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
 import android.content.ContentValues;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
+import android.os.Vibrator;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -106,8 +112,8 @@ public class MainList extends AppCompatActivity {
         database.onCreate(db);
 
 //        ContentValues values = new ContentValues();
-//        values.put("date","2021-10-25");
-//        values.put("hour","2");
+//        values.put("date","2021-11-01");
+//        values.put("hour","15");
 //        values.put("detections","3");
 //        db.insert("mytable",null,values);
 //        values = new ContentValues();
@@ -156,6 +162,82 @@ public class MainList extends AppCompatActivity {
 
         SharedPreferences sharedPreferences = getSharedPreferences("last",MODE_PRIVATE);
         tv_time.setText(sharedPreferences.getString("date",""));
+
+        SharedPreferences sharedPreferences1 = getSharedPreferences("alarm",MODE_PRIVATE);
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(this, "default");
+        NotificationManager notificationManager = (NotificationManager) this.getSystemService(Context.NOTIFICATION_SERVICE);
+
+        Thread th = new Thread(new Runnable() {
+            @RequiresApi(api = Build.VERSION_CODES.O)
+            @Override
+            public void run() {
+                while(true){
+                    Log.d("123", String.valueOf(sharedPreferences1.getInt("alarmType",0)));
+                    if(sharedPreferences1.getInt("alarmType",0)==1&& !switch1.isChecked()) {
+                        StringTokenizer st = new StringTokenizer(sharedPreferences1.getString("alarmTime", ""), ":");
+                        StringTokenizer st2 = new StringTokenizer(sharedPreferences.getString("date", ""), " ");
+                        String date = st2.nextToken();
+                        Log.d("123", String.valueOf(st.countTokens() > 0));
+                        Log.d("123", String.valueOf(st2.countTokens() > 0));
+                        Log.d("123", String.valueOf(date.equals(LocalDate.now().toString())));
+
+                        if (st.countTokens() > 0 && st2.countTokens() > 0 && date.equals(LocalDate.now().toString())) {
+                            String amPm = st2.nextToken();
+                            int hour, min, setHour, setMin;
+                            if (amPm.equals("오후")) {
+                                StringTokenizer st3 = new StringTokenizer(st2.nextToken(), "시");
+                                StringTokenizer st4 = new StringTokenizer(st2.nextToken(), "분");
+                                hour = Integer.parseInt(st3.nextToken()) + 12;
+                                min = Integer.parseInt(st4.nextToken());
+
+                            } else {
+                                StringTokenizer st3 = new StringTokenizer(st2.nextToken(), "시");
+                                StringTokenizer st4 = new StringTokenizer(st2.nextToken(), "분");
+                                hour = Integer.parseInt(st3.nextToken());
+                                min = Integer.parseInt(st4.nextToken());
+                            }
+                            setHour = Integer.parseInt(st.nextToken());
+                            setMin = Integer.parseInt(st.nextToken());
+                            LocalTime nowT = LocalTime.now();
+
+                            hour += setHour;
+                            min += setMin;
+
+                            Log.d("123", String.valueOf(hour));
+                            Log.d("123", String.valueOf(nowT.getHour()));
+                            Log.d("123", String.valueOf(min));
+
+                            if (min > 59) {
+                                min -= 60;
+                                hour++;
+                            }
+                            Log.d("123", String.valueOf(hour == nowT.getHour()));
+                            Log.d("123", String.valueOf(min == nowT.getMinute()));
+
+
+                            if (hour == nowT.getHour() && min == nowT.getMinute()) {
+                                Vibrator vibrator = (Vibrator) getSystemService(VIBRATOR_SERVICE);
+                                vibrator.vibrate(500); // 0.5초간 진동
+                                createNotification();
+
+                            }
+
+
+                        }
+                    }
+                    try {
+                        Thread.sleep(5000);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+
+                }
+            }
+        });
+
+        th.start();
+
+
 
         timesettingB.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -234,7 +316,6 @@ public class MainList extends AppCompatActivity {
             mmSocket = socket;
             InputStream tmpIn = null;
             OutputStream tmpOut = null;
-
             try {
                 tmpIn = socket.getInputStream();
                 tmpOut = socket.getOutputStream();
@@ -258,12 +339,15 @@ public class MainList extends AppCompatActivity {
                         bytes = mmInStream.available();
                         bytes = mmInStream.read(buffer, 0, bytes);
                         final String readMessage = new String((byte[]) buffer, "UTF-8");
+                        Log.d("get",readMessage);
                         mHandler.post(new Runnable() {
                             @SuppressLint({"Range", "SetTextI18n"})
                             @RequiresApi(api = Build.VERSION_CODES.O)
                             @Override
                             public void run() {
-                                int detection = Integer.parseInt(readMessage);
+                                int detection = Integer.parseInt(String.valueOf(readMessage.charAt(0)));
+                                Log.d("get",String.valueOf(detection));
+
                                 if(detection == 1) {
                                     Toast.makeText(getApplicationContext(),"움직임 감지",Toast.LENGTH_LONG).show();
                                     boolean write = false;
@@ -326,6 +410,28 @@ public class MainList extends AppCompatActivity {
             }
         }
     }
+    private void createNotification() {
+
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(this, "default");
+
+        builder.setSmallIcon(R.mipmap.ic_launcher);
+        builder.setContentTitle("움직임 감지");
+        builder.setContentText("확인 필");
+
+        builder.setColor(Color.RED);
+        // 사용자가 탭을 클릭하면 자동 제거
+        builder.setAutoCancel(true);
+
+        // 알림 표시
+        NotificationManager notificationManager = (NotificationManager) this.getSystemService(Context.NOTIFICATION_SERVICE);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            notificationManager.createNotificationChannel(new NotificationChannel("default", "기본 채널", NotificationManager.IMPORTANCE_DEFAULT));
+        }
+
+        // id값은
+        // 정의해야하는 각 알림의 고유한 int값
+        notificationManager.notify(1, builder.build());
+    }
 
     public void selectBluetoothDevice() {
 
@@ -341,45 +447,50 @@ public class MainList extends AppCompatActivity {
         // 페어링 되어있는 장치가 있는 경우
         else {
 
-            // 디바이스를 선택하기 위한 다이얼로그 생성
+            try {
+                connectDevice("mediandbacks");
 
-            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            }catch (Exception e){
+                // 디바이스를 선택하기 위한 다이얼로그 생성
 
-            builder.setTitle("페어링 되어있는 블루투스 디바이스 목록");
+                AlertDialog.Builder builder = new AlertDialog.Builder(this);
 
-            // 페어링 된 각각의 디바이스의 이름과 주소를 저장
+                builder.setTitle("페어링 되어있는 블루투스 디바이스 목록");
 
-            List<String> list = new ArrayList<>();
+                // 페어링 된 각각의 디바이스의 이름과 주소를 저장
 
-            // 모든 디바이스의 이름을 리스트에 추가
+                List<String> list = new ArrayList<>();
 
-            for(BluetoothDevice bluetoothDevice : devices) {
+                // 모든 디바이스의 이름을 리스트에 추가
 
-                list.add(bluetoothDevice.getName());
+                for(BluetoothDevice bluetoothDevice : devices) {
 
-            }
-            list.add("취소");
+                    list.add(bluetoothDevice.getName());
 
-
-            // List를 CharSequence 배열로 변경
-            final CharSequence[] charSequences = list.toArray(new CharSequence[list.size()]);
-            list.toArray(new CharSequence[list.size()]);
-
-            // 해당 아이템을 눌렀을 때 호출 되는 이벤트 리스너
-            builder.setItems(charSequences, new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int which) {
-                    // 해당 디바이스와 연결하는 함수 호출
-                    connectDevice(charSequences[which].toString());
                 }
-            });
-            // 뒤로가기 버튼 누를 때 창이 안닫히도록 설정
-            builder.setCancelable(false);
-            // 다이얼로그 생성
-            AlertDialog alertDialog = builder.create();
-            alertDialog.show();
+                list.add("취소");
+
+
+                // List를 CharSequence 배열로 변경
+                final CharSequence[] charSequences = list.toArray(new CharSequence[list.size()]);
+                list.toArray(new CharSequence[list.size()]);
+
+                // 해당 아이템을 눌렀을 때 호출 되는 이벤트 리스너
+                builder.setItems(charSequences, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        // 해당 디바이스와 연결하는 함수 호출
+                        connectDevice(charSequences[which].toString());
+                    }
+                });
+                // 뒤로가기 버튼 누를 때 창이 안닫히도록 설정
+                builder.setCancelable(false);
+                // 다이얼로그 생성
+                AlertDialog alertDialog = builder.create();
+                alertDialog.show();
+            }
+
+
         }
     }
-
-
 }
