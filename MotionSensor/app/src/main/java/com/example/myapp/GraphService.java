@@ -1,6 +1,24 @@
 package com.example.myapp;
 
+import android.annotation.SuppressLint;
+import android.bluetooth.BluetoothAdapter;
+import android.bluetooth.BluetoothDevice;
+import android.bluetooth.BluetoothSocket;
+import android.content.ContentValues;
+import android.content.Context;
+import android.content.SharedPreferences;
+import android.database.Cursor;
 import android.graphics.Color;
+import android.os.Build;
+import android.os.Handler;
+import android.os.Looper;
+import android.util.Log;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.TextView;
+import android.widget.Toast;
+
+import androidx.annotation.RequiresApi;
 
 import com.github.mikephil.charting.charts.LineChart;
 import com.github.mikephil.charting.components.Description;
@@ -10,8 +28,15 @@ import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.LineData;
 import com.github.mikephil.charting.data.LineDataSet;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
+import java.util.UUID;
 
 public class GraphService {
 
@@ -21,6 +46,7 @@ public class GraphService {
     public GraphService(LineChart lineChart) {
         this.lineChart = lineChart;
     }
+
 
     public void drawGraph(List<Entry> entries, int color){
         LineDataSet lineDataSet = new LineDataSet(entries, "");
@@ -32,13 +58,13 @@ public class GraphService {
 //        lineDataSet.setDrawCircleHole(false);
 //        lineDataSet.setDrawCircles(false);
         lineDataSet.setDrawHighlightIndicators(true);
-        lineDataSet.setDrawValues(false);
+        lineDataSet.setDrawValues(true);
         lineDataSet.setCubicIntensity(0.3f);
         lineDataSet.setDrawFilled(true);
-        lineDataSet.setDrawCircles(false);
+        lineDataSet.setDrawCircles(true);
         lineDataSet.setLineWidth(0.6f);
-//        lineDataSet.setCircleRadius(4f);
-//        lineDataSet.setCircleColor(Color.BLUE);
+        lineDataSet.setCircleRadius(4f);
+        lineDataSet.setCircleColor(Color.rgb(112,92,147));
 //        lineDataSet.setHighLightColor(Color.rgb(244, 117, 117));
         lineDataSet.setColor(color);
         lineDataSet.setFillColor(color);
@@ -76,6 +102,7 @@ public class GraphService {
         lineChart.setDescription(description);
         lineChart.invalidate();
     }
+
 
 
 }

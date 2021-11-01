@@ -3,6 +3,7 @@ package com.example.myapp;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.util.Log;
@@ -34,6 +35,13 @@ public class TimeSetting extends AppCompatActivity {
         BforAlarm = findViewById(R.id.BforAlarm);
         BforCall = findViewById(R.id.BforCall);
         save = findViewById(R.id.save);
+        SharedPreferences sharedPreferences = getSharedPreferences("account",MODE_PRIVATE);
+        if(sharedPreferences.getInt("mode",0)==1)BforCall.setVisibility(View.INVISIBLE);
+
+        SharedPreferences sharedPreferences1 = getSharedPreferences("alarm",MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPreferences1.edit();
+
+        if(!sharedPreferences1.getString("alarmTime","").equals("")) timepicker.setText(sharedPreferences1.getString("alarmTime",""));
 
         down_arrow.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -59,6 +67,12 @@ public class TimeSetting extends AppCompatActivity {
                     BforCall.setBackgroundResource(R.drawable.time_setting_button);
                     BforCall.setTextColor(Color.BLACK);
 
+                }else{
+                    alarmType =0;
+                    BforAlarm.setBackgroundResource(R.drawable.time_setting_button);
+                    BforAlarm.setTextColor(Color.BLACK);
+                    BforCall.setBackgroundResource(R.drawable.time_setting_button);
+                    BforCall.setTextColor(Color.BLACK);
                 }
 
             }
@@ -73,14 +87,25 @@ public class TimeSetting extends AppCompatActivity {
                     BforAlarm.setBackgroundResource(R.drawable.time_setting_button);
                     BforAlarm.setTextColor(Color.BLACK);
 
+                }else{
+                    alarmType =0;
+                    BforAlarm.setBackgroundResource(R.drawable.time_setting_button);
+                    BforAlarm.setTextColor(Color.BLACK);
+                    BforCall.setBackgroundResource(R.drawable.time_setting_button);
+                    BforCall.setTextColor(Color.BLACK);
                 }
             }
         });
 
+        if(sharedPreferences1.getInt("alarmType",0)==1) BforAlarm.performClick();
+        else if(sharedPreferences1.getInt("alarmType",0)==2) BforCall.performClick();
         save.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 //TODO 저장하는 부분 구현 필요
+                editor.putInt("alarmType",alarmType);
+                editor.putString("alarmTime",timepicker.getText().toString());
+                editor.apply();
                 finish();
             }
         });
