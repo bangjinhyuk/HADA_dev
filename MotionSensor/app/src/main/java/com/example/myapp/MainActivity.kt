@@ -12,6 +12,7 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
 
         startActivity(Intent(this@MainActivity, LoginActivity::class.java))
+        finish()
 
 //        // activity_main의 일반 사용자 로그인 버튼을 누르면 activity_login으로 이동
 //        UserLoginB.setOnClickListener {
