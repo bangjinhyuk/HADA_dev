@@ -3,7 +3,7 @@ HADA development
 
 1. 구성 
     * Android Studio - java
-    * Firebase funtions - nodejs
+    * Firebase Function - nodejs
     * Firebase realtime database
     
     <img src="./img/realtimefirebase.png" width="200" height="400"/>
