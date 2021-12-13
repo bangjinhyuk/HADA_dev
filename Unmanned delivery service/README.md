@@ -3,8 +3,8 @@ HADA development
 
 1. 구성 
     * Android Studio - java
-    * Firebase funtions - nodejs
-    * Firebase realtime database
+    * Firebase Function - nodejs
+    * Firebase Realtime database
         + storage (호수 : 초기값-0)
         + password (호수 : 비밀번호)
         + alarm (택배함 번호 : 호수)
